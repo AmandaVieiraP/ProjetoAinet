@@ -38,5 +38,15 @@ Route::patch('/me/password', 'UserController@changePassword')->name('me.password
  // mudar perfil 
 Route::patch('/me/profile', 'UserController@meProfile')->name('me.profile');
 
-
+Route::get('profiles/{name}', 'UserController@getProfile')->name('users.profiles');
+Route::get('me/associates', 'UserController@getAssociates')->name('users.associates');
+Route::get('me/associate-of','UserController@getAssociateOfMe')->name('me.associateOf');
+Route::get('accounts/{user}','AccountController@showAccount')->name('account');
+Route::get('accounts/{user}/opened','AccountController@showOpenAccount')->name('openedAcounts');
+Route::get('accounts/{user}/closed','AccountController@showCloseAccount')->name('account.closed');
+Route::delete('account/{account}', 'AccountController@destroy')->name('account.delete');
+Route::patch('account/{account}/close','AccountController@updateClose')->name('account.close');
+Route::patch('account/{account}/reopen','AccountController@updateReopen')->name('account.reopen');
+Route::post('account','AccountController@store')->name('accounts.store');
+Route::put('account/{account}','AccountController@update')->name('accounts.editAccount');
 

@@ -25,4 +25,16 @@ class UserController extends Controller
     public function demoteUser($user) {
     	
     }
+
+    public function getProfile($name) {
+
+    }
+
+    public function getAssociates(){
+
+    }
+
+    public function getAssociateOfMe(){
+
+    }
 }
