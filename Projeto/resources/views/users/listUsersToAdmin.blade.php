@@ -20,12 +20,14 @@
                     Sim 
                  @else 
                     Não
-                 @endif </td>
+                 @endif 
+              </td>
             <td> @if($user->blocked == 1)
                     Sim 
                  @else 
                     Não
-                 @endif </td>
+                 @endif 
+              </td>
         </tr>
         @endforeach
     </table>
