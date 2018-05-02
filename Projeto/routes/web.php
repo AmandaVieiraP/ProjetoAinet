@@ -50,3 +50,26 @@ Route::patch('account/{account}/reopen','AccountController@updateReopen')->name(
 Route::post('account','AccountController@store')->name('accounts.store');
 Route::put('account/{account}','AccountController@update')->name('accounts.editAccount');
 
+//US.20
+Route::get('/movements/{account}','MovementController@index')->name('movements.index');
+//US.21
+Route::get('/movements/{account}/create','MovementController@create')->name('movements.create');
+//US.21
+Route::post('/movements/{account}/create','MovementController@store')->name('movements.store');
+//US.21
+Route::get('/movements/{account}/{movement}','MovementController@edit')->name('movements.edit');
+//US.21
+Route::put('/movements/{account}/{movement}','MovementController@edit')->name('movements.update');
+//US.21
+Route::delete('/movements/{account}/{movement}','MovementController@destroy')->name('movements.destroy');
+
+//US.24
+Route::delete('/documents/{movement}/{document}','DocumentController@destroy')->name('documents.destroy');
+//US.25
+Route::get('/documents/{movement}/{document}','DocumentController@getDoc')->name('documents.getdoc');
+//US.26
+Route::get('/me/dashboard','UserController@showSummary')->name('user.summary');
+//US.29
+Route::post('/me/associates','UserController@createAssociate')->name('users.associate.create');
+//US.30
+Route::delete('/me/associates/{user}','UserController@destroyAssociate')->name('users.associate.destroy');

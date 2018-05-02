@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class AccountController extends Controller
+class DocumentController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -80,20 +80,5 @@ class AccountController extends Controller
     public function destroy($id)
     {
         //
-    }
-    public function showAccount(){
-
-    }
-    public function showOpenAccount($user){
-
-    }
-    public function showCloseAccount($user){
-
-    }
-    public function updateClose($account){
-
-    }
-    public function updateReopen($account){
-
     }
 }
