@@ -113,4 +113,13 @@ class UserController extends Controller
     public function getAssociateOfMe(){
 
     }
+    public function createAssociate(){
+
+    }
+    public function destroyAssociate($id){
+
+    }
+    public function showSummary(){
+        
+    }
 }

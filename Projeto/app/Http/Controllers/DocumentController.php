@@ -81,4 +81,9 @@ class DocumentController extends Controller
     {
         //
     }
+
+
+    public function getDoc($id){
+
+    } 
 }

@@ -59,7 +59,7 @@ Route::post('/movements/{account}/create','MovementController@store')->name('mov
 //US.21
 Route::get('/movements/{account}/{movement}','MovementController@edit')->name('movements.edit');
 //US.21
-Route::put('/movements/{account}/{movement}','MovementController@edit')->name('movements.update');
+Route::put('/movements/{account}/{movement}','MovementController@update')->name('movements.update');
 //US.21
 Route::delete('/movements/{account}/{movement}','MovementController@destroy')->name('movements.destroy');
 
