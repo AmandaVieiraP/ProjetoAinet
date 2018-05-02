@@ -21,7 +21,7 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 
  // mostra lista de todos os users (mesmo users bloqueados e administradores) mostra nome, email, type e status (bloqueado ou não)
-Route::get('/users', 'UserController@listAllUsersToAdmin')->name('list.of.all.users');
+Route::get('/users', 'UserController@listAllUsersToAdmin')->middleware('admin')->name('list.of.all.users');
 
 Route::patch('/users/{user}/block', 'UserController@blockUser')->name('block.user');
 

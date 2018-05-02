@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\User;
 
 class UserController extends Controller
 {
@@ -83,7 +84,9 @@ class UserController extends Controller
     }
 
     public function listAllUsersToAdmin() {
-        
+        $users = User::All();
+        $pagetitle = "List of Users";
+        return view('users.listUserForAdmin', compact('users', 'pagetitle'));
     }
 
     public function blockUser($user) {
