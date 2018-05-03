@@ -11,9 +11,16 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+
+/*Route::get('/', function () {
+	$users = User::all();
+	$movements = Movement::all();
+	$
+	$pagetitle = "Página inicial";
+    return view('initialPage', compact('users', 'movements', 'pagetitle'));
+}); */
+
+Route::get('/', 'Controller@initialPage')->name('initial.page');
 
 
 Auth::routes();

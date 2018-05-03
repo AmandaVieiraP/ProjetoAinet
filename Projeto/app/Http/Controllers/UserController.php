@@ -86,7 +86,7 @@ class UserController extends Controller
     public function listAllUsersToAdmin() {
         $users = User::All();
         $pagetitle = "List of Users";
-        return view('users.listUserForAdmin', compact('users', 'pagetitle'));
+        return view('users.listUsersToAdmin', compact('users', 'pagetitle'));
     }
 
     public function blockUser($user) {
@@ -122,7 +122,9 @@ class UserController extends Controller
     public function destroyAssociate($id){
 
     }
+
     public function showSummary(){
         
     }
+
 }

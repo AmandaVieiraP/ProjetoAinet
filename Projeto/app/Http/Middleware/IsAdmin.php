@@ -20,6 +20,6 @@ class IsAdmin
         if ($request->user() && $request->user()->admin == 1) {
             return $next($request);
         }
-        throw new AccessDeniedHttpException('Unauthorized.');
+        return redirect()->route('initial.page')->with('msg', "Not autorized to see the users page");
     }
 }

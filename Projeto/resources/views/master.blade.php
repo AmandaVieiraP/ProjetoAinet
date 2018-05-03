@@ -2,6 +2,7 @@
 <html>
 <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{{ $pagetitle }}</title>
         <!-- Latest compiled and minified CSS & JS -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
@@ -12,7 +13,20 @@
         <div class="jumbotron">
           <h1>{{ $pagetitle }}</h1>
         </div>
-        @yield('content')
+        <div class="btn group float-right">
+            @guest
+              <a class="btn btn-outline-primary btn float-right" href="{{ route('login') }}">Login</a>
+              <a class="btn btn-outline-primary btn float-right" href="{{ route('register') }}">Register</a>
+            @else
+              <a class="btn btn-outline-primary btn float-right" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a> 
+              <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                 @csrf
+              </form>
+            @endguest
+        </div>
+
+            @yield('content')
+
      </div>
     <script src="//code.jquery.com/jquery.js"></script>
    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
