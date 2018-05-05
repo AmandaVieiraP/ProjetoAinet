@@ -16,10 +16,10 @@ class Controller extends BaseController
     
 
     public function initialPage() {
-    	$users = User::all();
-		$movements = Movement::all();
-		$accounts = Account::all();
-		$pagetitle = "Página inicial";
-    	return view('initialPage', compact('users', 'movements', 'accounts', 'pagetitle'));
+        $users = User::all();
+        $movements = Movement::all();
+        $accounts = Account::all();
+        $pagetitle = "Página inicial";
+        return view('initialPage', compact('users', 'movements', 'accounts', 'pagetitle'));
     }
 }

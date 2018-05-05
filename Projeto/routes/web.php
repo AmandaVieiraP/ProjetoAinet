@@ -20,14 +20,15 @@
     return view('initialPage', compact('users', 'movements', 'pagetitle'));
 }); */
 
+//US1
 Route::get('/', 'Controller@initialPage')->name('initial.page');
 
-
+//US2, US3, US4
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
- // mostra lista de todos os users (mesmo users bloqueados e administradores) mostra nome, email, type e status (bloqueado ou não)
+//US5, US6
 Route::get('/users', 'UserController@listAllUsersToAdmin')->middleware('admin')->name('list.of.all.users');
 
 Route::patch('/users/{user}/block', 'UserController@blockUser')->name('block.user');

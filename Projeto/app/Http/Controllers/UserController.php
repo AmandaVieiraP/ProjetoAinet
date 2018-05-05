@@ -84,9 +84,72 @@ class UserController extends Controller
     }
 
     public function listAllUsersToAdmin() {
-        $users = User::All();
-        $pagetitle = "List of Users";
-        return view('users.listUsersToAdmin', compact('users', 'pagetitle'));
+       $pagetitle = "List of Users";
+
+        $type=UserController::validate_type($request);
+
+        $status=UserController::validate_status($request);
+
+        $name=$request->input('name');
+
+        $users=UserController::filter($name, $type, $status);
+
+        return view('users.listUsersToAdmin', compact('users', 'pagetitle'));   
+    }
+
+    private static function validate_type(Request $request){
+        $type=$request->input('type');
+
+        if($type=='normal')
+            return '0';
+        elseif($type!=null && $type=='admin')
+            return '1';
+    }
+
+    private static function validate_status(Request $request){
+        $status=$request->input('status');
+        if($status!=null && $status=='blocked')
+            return '1';
+        elseif($status!=null && $status=='unblocked')
+            return '0';
+    }
+
+    private static function filter($name, $type, $status){
+        if($name==null  && $type==null && $status==null){
+            return User::All();
+        }
+
+        //se tem só name
+        if($name!=null && $type==null && $status==null){
+           return User::where('name','like','%'.$name.'%')->get();
+        }
+
+        //se so tem type
+        if($name==null && $type!=null && $status==null){
+           return User::where('admin','=',$type)->get();
+        }
+
+        //se so tem status
+        if($name==null && $type==null && $status!=null){
+           return User::where('blocked','=',$status)->get();
+        }
+
+        //se tem name e type
+        if($name!=null && $type!=null && $status==null){
+           return User::where('name','like','%'.$name.'%')->where('admin','=',$type)->get();
+        }
+        //se tem name e status
+        if($name!=null && $type==null && $status!=null){
+           return User::where('name','like','%'.$name.'%')->where('blocked','=',$status)->get();
+        }
+        //se tem status e type
+        if($name==null && $type!=null && $status!=null){
+           return User::where('admin','=',$type)->where('blocked','=',$status)->get();
+        }
+        //se tem os tres
+        if($name!=null && $type!=null && $status!=null){
+           return User::where('name','like','%'.$name.'%')->where('admin','=',$type)->where('blocked','=',$status)->get();
+        }
     }
 
     public function blockUser($user) {
