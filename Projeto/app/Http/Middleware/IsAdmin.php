@@ -21,6 +21,10 @@ class IsAdmin
             return $next($request);
         }
 
-        return redirect()->route('initial.page')->with('msg', "Error");
+        if ($request->user() && $request->user()->admin == 0) {
+            abort(403, "unauthorized");
+        }
+
+        return redirect()->route('login')->with('msg', "Error");
     }
 }
