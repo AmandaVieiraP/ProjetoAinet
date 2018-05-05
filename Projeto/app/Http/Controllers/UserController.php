@@ -100,6 +100,10 @@ class UserController extends Controller
 
         $users=UserController::filter($name, $type, $status);
 
+        if ($users == null) {
+            $users=User::all();
+        }
+
         return view('users.listUsersToAdmin', compact('users', 'pagetitle'));   
     }
 
@@ -152,6 +156,7 @@ class UserController extends Controller
         if($name!=null && $type!=null && $status!=null){
            return User::where('name','like','%'.$name.'%')->where('admin','=',$type)->where('blocked','=',$status)->get();
         }
+        return null;
     }
 
     public function blockUser($user) {
