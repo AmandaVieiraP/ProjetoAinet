@@ -20,6 +20,7 @@ class IsAdmin
         if ($request->user() && $request->user()->admin == 1) {
             return $next($request);
         }
-        return redirect()->route('initial.page')->with('msg', "Not autorized to see the users page");
+
+        return redirect()->route('initial.page')->with('msg', "Error");
     }
 }

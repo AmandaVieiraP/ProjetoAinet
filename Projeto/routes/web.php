@@ -11,15 +11,6 @@
 |
 */
 
-
-/*Route::get('/', function () {
-	$users = User::all();
-	$movements = Movement::all();
-	$
-	$pagetitle = "Página inicial";
-    return view('initialPage', compact('users', 'movements', 'pagetitle'));
-}); */
-
 //US1
 Route::get('/', 'Controller@initialPage')->name('initial.page');
 
@@ -47,6 +38,7 @@ Route::patch('/me/password', 'UserController@changePassword')->name('me.password
 Route::patch('/me/profile', 'UserController@meProfile')->name('me.profile');
 
 Route::get('profiles/{name}', 'UserController@getProfile')->name('users.profiles');
+//US - 12
 Route::get('me/associates', 'UserController@getAssociates')->name('users.associates');
 Route::get('me/associate-of','UserController@getAssociateOfMe')->name('me.associateOf');
 Route::get('accounts/{user}','AccountController@showAccount')->name('account');

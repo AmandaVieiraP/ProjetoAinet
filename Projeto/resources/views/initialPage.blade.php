@@ -1,7 +1,11 @@
 @extends('master') 
 @section('content') 
 
-{{ @session('msg') }}
+@if(Session::has('msg'))
+@alert(['type' => 'danger','title'=>'Warning!'])
+Unauthorized Access!
+@endalert
+@endif
 
 <table class="table table-striped">
 	<thread> 

@@ -5,7 +5,7 @@
     <form action="{{ route('list.of.all.users') }}" method="get" class="form-inline">
         <div class="form-group">
             <label for="inputName" class="mr-sm-2">Name</label>
-            <input type="text" name="name" id="inputName" placeholder=" Enter name" class="form-control mb-2 mr-sm-2 mb-sm-0">
+            <input type="text" name="name" id="inputName" placeholder=" Enter name" class="form-control mb-2 mr-sm-2 mb-sm-0" value="{{ old('name') }}">
         </div>
         <div class="form-group">
             <label for="selectType" class="mr-sm-2">Type</label>

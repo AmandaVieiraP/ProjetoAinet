@@ -17,6 +17,7 @@
             @guest
               <a class="btn btn-outline-primary btn float-right" href="{{ route('login') }}">Login</a>
               <a class="btn btn-outline-primary btn float-right" href="{{ route('register') }}">Register</a>
+
             @else
               <a class="btn btn-outline-primary btn float-right" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a> 
               <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">

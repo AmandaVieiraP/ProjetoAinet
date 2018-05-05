@@ -13,7 +13,6 @@ use App\Account;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
-    
 
     public function initialPage() {
         $users = User::all();

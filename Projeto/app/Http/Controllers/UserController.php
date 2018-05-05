@@ -83,8 +83,14 @@ class UserController extends Controller
         //
     }
 
-    public function listAllUsersToAdmin() {
-       $pagetitle = "List of Users";
+    public function listAllUsersToAdmin(Request $request) {
+
+        $pagetitle = "List of Users";
+
+        if(!$request->filled('name') && !$request->filled('type') && !$request->filled('status')){
+           $users=User::all();
+           return view('users.listUsersToAdmin', compact('users', 'pagetitle'));  
+        }
 
         $type=UserController::validate_type($request);
 
@@ -115,13 +121,9 @@ class UserController extends Controller
     }
 
     private static function filter($name, $type, $status){
-        if($name==null  && $type==null && $status==null){
-            return User::All();
-        }
-
         //se tem só name
         if($name!=null && $type==null && $status==null){
-           return User::where('name','like','%'.$name.'%')->get();
+           return User::where('name','like',$name.'%')->get();
         }
 
         //se so tem type
@@ -173,7 +175,9 @@ class UserController extends Controller
     }
 
     public function getAssociates(){
-
+        //As a user I want to view the list of users that belong to my group of associate members.
+        
+        //The list should show at least the name and email of the member;
     }
 
     public function getAssociateOfMe(){
@@ -185,9 +189,7 @@ class UserController extends Controller
     public function destroyAssociate($id){
 
     }
-
     public function showSummary(){
         
     }
-
 }
