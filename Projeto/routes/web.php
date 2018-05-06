@@ -20,7 +20,8 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 
 //US5, US6
-Route::get('/users', 'UserController@listAllUsersToAdmin')->middleware('admin')->name('list.of.all.users');
+Route::get('/users', 'UserController@listAllUsersToAdmin')->middleware('can:admin')->name('list.of.all.users');
+//Route::get('/users', 'UserController@listAllUsersToAdmin')->middleware('admin')->name('list.of.all.users');
 
 Route::patch('/users/{user}/block', 'UserController@blockUser')->name('block.user');
 
