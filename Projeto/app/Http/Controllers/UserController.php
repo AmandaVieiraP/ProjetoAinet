@@ -87,77 +87,93 @@ class UserController extends Controller
 
         $pagetitle = "List of Users";
 
+        //se nada estiver prenchido
         if(!$request->filled('name') && !$request->filled('type') && !$request->filled('status')){
            $users=User::all();
            return view('users.listUsersToAdmin', compact('users', 'pagetitle'));  
         }
+        //se type ou status invalido
+        if(($request->filled('type') && $request->query('type')!='admin' && $request->query('type')!='normal') || ($request->filled('status') && $request->query('status')!='blocked' && $request->query('status')!='unblocked')){
 
-        $type=UserController::validate_type($request);
-
-        $status=UserController::validate_status($request);
-
-        $name=$request->input('name');
-
-        $users=UserController::filter($name, $type, $status);
-
-        if ($users == null) {
             $users=User::all();
+            return view('users.listUsersToAdmin', compact('users', 'pagetitle'));
         }
 
-        return view('users.listUsersToAdmin', compact('users', 'pagetitle'));   
+        //suporta type normal só type admin
+        if(!$request->filled('name')&& $request->filled('type') && $request->query('type')=='admin' && !$request->filled('status')){
+
+            $users=User::where('admin','=',true)->get();
+            return view('users.listUsersToAdmin', compact('users', 'pagetitle'));
+        }
+
+        //suporta status blocked
+        if(!$request->filled('name')&& !$request->filled('type') && $request->filled('status') && $request->query('status')=='blocked'){
+            $users=User::where('blocked','=',true)->get();
+            return view('users.listUsersToAdmin', compact('users', 'pagetitle'));
+        }
+
+        //suporta status unblocked
+        if(!$request->filled('name')&& !$request->filled('type') && $request->filled('status') && $request->query('status')=='unblocked'){
+            $users=User::where('blocked','=',false)->get();
+            return view('users.listUsersToAdmin', compact('users', 'pagetitle'));
+        }
+
+        //suporta type normal só type normal
+        if(!$request->filled('name')&& $request->filled('type') && $request->query('type')=='normal' && !$request->filled('status')){
+            $users=User::where('admin','=',false)->get();
+            return view('users.listUsersToAdmin', compact('users', 'pagetitle'));
+        }
+
+        //ver se suporta nome total ou parcial - apenas
+        if($request->filled('name') && !$request->filled('type') && !$request->filled('status')){
+            $users=User::where('name','like','%'.$request->query('name').'%')->get();
+            return view('users.listUsersToAdmin', compact('users', 'pagetitle'));
+        }
+        //ver se suporta nome total ou parcial + type
+        if($request->filled('name') && $request->filled('type') && !$request->filled('status')){
+            if($request->query('type')=='normal'){
+                $users=User::where('name','like','%'.$request->query('name').'%')->where('admin','=',false)->get();
+            }
+            else{
+                $users=User::where('name','like','%'.$request->query('name').'%')->where('admin','=',true)->get();
+            }
+            return view('users.listUsersToAdmin', compact('users', 'pagetitle'));
+        }
+        //ver se suporta nome total ou parcial + status
+        if($request->filled('name') && !$request->filled('type') && $request->filled('status')){
+            if($request->query('status')=='blocked'){
+                $users=User::where('name','like','%'.$request->query('name').'%')->where('blocked','=',true)->get();
+            }
+            else{
+                $users=User::where('name','like','%'.$request->query('name').'%')->where('blocked','=',false)->get();
+            }
+            return view('users.listUsersToAdmin', compact('users', 'pagetitle'));
+        }
+         //ver se suporta nome total ou parcial + type + status
+        if($request->filled('name') && $request->filled('type') && $request->filled('status')){
+            if($request->query('type')=='normal'){
+                if($request->query('status')=='blocked'){
+                    $users=User::where('name','like','%'.$request->query('name').'%')->where('admin','=',false)->where('blocked','=',true)->get();
+                }
+                else{
+                    $users=User::where('name','like','%'.$request->query('name').'%')->where('admin','=',false)->where('blocked','=',false)->get();
+                }
+            }
+            else{
+                if($request->query('status')=='blocked'){
+                    var_dump(5.111);
+                    $users=User::where('name','like','%'.$request->query('name').'%')->where('admin','=',true)->where('blocked','=',true)->get();
+                }
+                else{
+                    $users=User::where('name','like','%'.$request->query('name').'%')->where('admin','=',true)->where('blocked','=',false)->get();
+                }
+            }
+            return view('users.listUsersToAdmin', compact('users', 'pagetitle'));
+        }
+        
     }
 
-    private static function validate_type(Request $request){
-        $type=$request->input('type');
 
-        if($type=='normal')
-            return '0';
-        elseif($type!=null && $type=='admin')
-            return '1';
-    }
-
-    private static function validate_status(Request $request){
-        $status=$request->input('status');
-        if($status!=null && $status=='blocked')
-            return '1';
-        elseif($status!=null && $status=='unblocked')
-            return '0';
-    }
-
-    private static function filter($name, $type, $status){
-        //se tem só name
-        if($name!=null && $type==null && $status==null){
-           return User::where('name','like',$name.'%')->get();
-        }
-
-        //se so tem type
-        if($name==null && $type!=null && $status==null){
-           return User::where('admin','=',$type)->get();
-        }
-
-        //se so tem status
-        if($name==null && $type==null && $status!=null){
-           return User::where('blocked','=',$status)->get();
-        }
-
-        //se tem name e type
-        if($name!=null && $type!=null && $status==null){
-           return User::where('name','like','%'.$name.'%')->where('admin','=',$type)->get();
-        }
-        //se tem name e status
-        if($name!=null && $type==null && $status!=null){
-           return User::where('name','like','%'.$name.'%')->where('blocked','=',$status)->get();
-        }
-        //se tem status e type
-        if($name==null && $type!=null && $status!=null){
-           return User::where('admin','=',$type)->where('blocked','=',$status)->get();
-        }
-        //se tem os tres
-        if($name!=null && $type!=null && $status!=null){
-           return User::where('name','like','%'.$name.'%')->where('admin','=',$type)->where('blocked','=',$status)->get();
-        }
-        return null;
-    }
 
     public function blockUser($user) {
 
