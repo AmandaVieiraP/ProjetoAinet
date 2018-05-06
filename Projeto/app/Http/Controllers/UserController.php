@@ -95,7 +95,7 @@ class UserController extends Controller
 
     private static function filter(Request $request){
         //se nada estiver prenchido
-        if(!$request->filled(['name','type','status'])){
+        if(!$request->filled('name') && !$request->filled('type') && !$request->filled('status')){
            return User::all(); 
         }
 
@@ -106,27 +106,27 @@ class UserController extends Controller
         }
 
         //só type normal
-        if(!$request->filled(['name','status'])&& $request->filled('type') && $request->query('type')=='normal'){
+        if(!$request->filled('name')&& $request->filled('type') && $request->query('type')=='normal' && !$request->filled('status')){
             return User::where('admin','=',false)->get();
         }
         //só type admin
-        if(!$request->filled(['name','status'])&& $request->filled('type') && $request->query('type')=='admin'){
+        if(!$request->filled('name')&& $request->filled('type') && $request->query('type')=='admin' && !$request->filled('status')){
 
             return User::where('admin','=',true)->get();
         }
 
         //só status blocked
-        if(!$request->filled(['name','type']) && $request->filled('status') && $request->query('status')=='blocked'){
+        if(!$request->filled('name')&& !$request->filled('type') && $request->filled('status') && $request->query('status')=='blocked'){
             return User::where('blocked','=',true)->get();
         }
 
         //só status unblocked
-        if(!$request->filled(['name','type']) && $request->filled('status') && $request->query('status')=='unblocked'){
+        if(!$request->filled('name')&& !$request->filled('type') && $request->filled('status') && $request->query('status')=='unblocked'){
             return User::where('blocked','=',false)->get();
         }
 
         //type+status
-        if(!$request->filled('name')&& $request->filled(['type','status']) && $request->query('type')=='normal'){
+        if(!$request->filled('name')&& $request->filled('type') && $request->query('type')=='normal' && $request->filled('status')){
             //'normal'+'blocked'
             if($request->query('status')=='blocked'){
                 return User::where('admin','=',false)->where('blocked','=',true)->get();
@@ -137,7 +137,7 @@ class UserController extends Controller
             }
         }
 
-        if(!$request->filled('name')&& $request->filled(['type','status']) && $request->query('type')=='admin'){
+        if(!$request->filled('name')&& $request->filled('type') && $request->query('type')=='admin' && $request->filled('status')){
             //'admin'+'blocked'
             if($request->query('status')=='blocked'){
                 return User::where('admin','=',true)->where('blocked','=',true)->get();
@@ -149,12 +149,12 @@ class UserController extends Controller
         }
 
         //só nome
-        if($request->filled(['name','status']) && !$request->filled('type')){
+        if($request->filled('name') && !$request->filled('type') && !$request->filled('status')){
             return User::where('name','like','%'.$request->query('name').'%')->get();
         }
 
         //nome+type
-        if($request->filled(['name','type']) && !$request->filled('status')){
+        if($request->filled('name') && $request->filled('type') && !$request->filled('status')){
             //'normal'
             if($request->query('type')=='normal'){
                 return User::where('name','like','%'.$request->query('name').'%')->where('admin','=',false)->get();
@@ -165,7 +165,7 @@ class UserController extends Controller
             }
         }
         //nome+status
-        if($request->filled(['name','status']) && !$request->filled('type')){
+        if($request->filled('name') && !$request->filled('type') && $request->filled('status')){
             //blocked
             if($request->query('status')=='blocked'){
                 return User::where('name','like','%'.$request->query('name').'%')->where('blocked','=',true)->get();
@@ -176,7 +176,7 @@ class UserController extends Controller
             }
         }
          //nome+type+status
-        if($request->filled(['name','type','status'])){
+        if($request->filled('name') && $request->filled('type') && $request->filled('status')){
             //'nome'+'normal'+'blocked'
             if($request->query('type')=='normal'){
                 if($request->query('status')=='blocked'){
