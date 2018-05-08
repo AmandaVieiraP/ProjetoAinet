@@ -33,6 +33,10 @@ Route::patch('/users/{user}/promote', 'UserController@promoteUser')->name('promo
   // tira admin do user
 Route::patch('/users/{user}/demote', 'UserController@demoteUser')->name('demote.user');
 
+//US9
+//acrescentei esta rota apenas para mostrar o formulario
+Route::get('/me/password','UserController@showChangePasswordForm')->name('me.passwordForm');
+
 Route::patch('/me/password', 'UserController@changePassword')->name('me.password');
 
  // mudar perfil 

@@ -4,9 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\User;
+use Illuminate\Support\Facades\Hash;
+use Auth;
+use Validator;
 
 class UserController extends Controller
 {
+    public function __construct(){
+        $this->middleware('auth');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -83,6 +89,7 @@ class UserController extends Controller
         //
     }
 
+    //US5 e US6--------------------------------------------------------
     public function listAllUsersToAdmin(Request $request) {
 
         $pagetitle = "List of Users";
@@ -200,7 +207,7 @@ class UserController extends Controller
             }
         }
     }
-
+    //------------------------------------------------------------------------
 
 
     public function blockUser($user) {
@@ -241,4 +248,53 @@ class UserController extends Controller
     public function showSummary(){
         
     }
+
+    //US9----------------------------------------------------------------
+    public function showChangePasswordForm(){
+        $pagetitle = "Change My Password";
+        return view('users.changePassword', compact('pagetitle'));
+    }
+
+    public function changePassword(Request $request){
+        if ($request->has('cancel')) {
+            return redirect()->route('home');
+        }
+
+        //validação:
+        //require-> campo tem de estar preenchido
+        //confirmed-> existe um campo que há pelo menos outro campo igual no questionario e que é diferente de old_passwod
+         
+         // A password change fails with invalid old password
+         // 
+        $validatedData=$request->validate([
+            'old_password'=>'required',
+            'password'=>'required|confirmed|min:3|different:old_password',
+            'password_confirmation'=>'required|same:password',
+        ], [ 
+        'old_password.required' => 'You must enter your current password',
+        'password.required' => 'You must enter a new password',
+        'password.different' => 'The new password must be different from the current password',
+        'password.min' => 'The new password must have at least 3 characters',
+        'password_confirmation.required' => 'You must enter the confirmation password',
+        'password_confirmation.same' => 'The confirmation password must be equal to new password',
+        ]);
+
+        //false->old diferente da pass entao envia erro
+        if (!(Hash::check($request->input('old_password'), Auth::user()->password))) {
+            
+
+            return redirect()->route('me.password')->withErrors(['old_password' => 'Please enter the correct current password']);
+        }
+            
+        $user_id=Auth::user()->id;
+        $user=User::findOrFail($user_id);
+        $user->password=Hash::make($request->input('password'));
+        $user->save();
+
+
+        return redirect()->route('home')->with('sucess', 'Your password has been updated')->setStatusCode(202);
+        
+    }
+    //US9----------------------------------------------------------------
+
 }

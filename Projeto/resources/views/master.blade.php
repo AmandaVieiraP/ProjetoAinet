@@ -59,14 +59,12 @@
                                     <a class="dropdown-item" href="{{ route('home') }}">
                                         My Profile
                                     </a>
+                                    <!--Acrescentar novas opcoes de menu aqui-->
+                                    <a class="dropdown-item" href="{{ route('me.passwordForm') }}">
+                                        Change My Password
+                                    </a>
                                     <a class="dropdown-item" href="#">
                                         Accounts
-                                    </a>
-                                    
-                                    <a class="dropdown-item" href="{{ route('logout') }}"
-                                       onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                                        Logout
                                     </a>
                                     @can('admin')
                                     <a class="dropdown-item" href="{{route('list.of.all.users') }}">
@@ -74,9 +72,15 @@
                                     </a>
                                     @endcan
 
+                                    <a class="dropdown-item" href="{{ route('logout') }}"
+                                       onclick="event.preventDefault();
+                                                     document.getElementById('logout-form').submit();">
+                                        Logout
+                                    </a>
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                                         @csrf
                                     </form>
+
                                 </div>
                             </li>
                         @endguest
