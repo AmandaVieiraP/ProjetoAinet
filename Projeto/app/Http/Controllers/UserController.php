@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+//use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RedirectResponse;
+use Illuminate\Support\Facades\Response;
 use App\User;
 
 class UserController extends Controller
@@ -86,7 +90,6 @@ class UserController extends Controller
     public function listAllUsersToAdmin(Request $request) {
 
         $pagetitle = "List of Users";
-
         $users=UserController::filter($request);
 
         return view('users.listUsersToAdmin', compact('users', 'pagetitle')); 
@@ -203,20 +206,80 @@ class UserController extends Controller
 
 
 
-    public function blockUser($user) {
+    public function blockUser(Request $request, $user) {
+        $userToBlock = User::findOrFail($user);
+        if (Auth::user()->id == $userToBlock->id) {
+            $pagetitle = "Unauthorized";
+            return Response::make(view('errors.403', compact('pagetitle')), 403);
+            //abort(403, "unauthorized");
+            //return redirect()->route('list.of.all.users')->with('msg', "You can't block yourself"); 
+        }
+        if ($userToBlock->blocked == 1) {
+            $request->session()->flash('errorMsg', 'User is already blocked!');
+            return $this->listAllUsersToAdmin($request);
+        } 
+        $userToBlock->blocked = 1;
+        $userToBlock->save();
 
+        $request->session()->flash('successMsg', 'User blocked succesufully!');
+        return $this->listAllUsersToAdmin($request);
     }
 
-    public function unblockUser($user) {
+    public function unblockUser(Request $request, $user) {
 
-    }
-
-    public function promoteUser($user) {
-
-    }
-
-    public function demoteUser($user) {
+        $userToUnblock = User::findOrFail($user);
         
+        if (Auth::user()->id == $userToUnblock->id) {
+            $pagetitle = "Unauthorized";
+            return Response::make(view('errors.403', compact('pagetitle')), 403);
+            //abort(403, "unauthorized");
+            //return redirect()->route('list.of.all.users')->with('msg', "You can't unblock yourself"); 
+        }
+        if ($userToUnblock->blocked == 0) {
+            //return redirect()->route('list.of.all.users')->with('msg', "User is already not blocked");
+            $request->session()->flash('errorMsg', 'User is already unblocked!');
+            return $this->listAllUsersToAdmin($request);
+        };
+        $userToUnblock->blocked = 0;
+        $userToUnblock->save();
+        $request->session()->flash('successMsg', 'User unblocked succesufully!');
+        return $this->listAllUsersToAdmin($request);
+    }
+
+    public function promoteUser(Request $request, $user) {
+        $userToPromote = User::findOrFail($user);
+        if (Auth::user()->id == $userToPromote->id) {
+            $pagetitle = "Unauthorized";
+            return Response::make(view('errors.403', compact('pagetitle')), 403);
+           // abort(403, "unauthorized");
+        }
+        if ($userToPromote->admin == 1) {
+            $request->session()->flash('errorMsg', 'User is already admin!');
+            return $this->listAllUsersToAdmin($request);
+        };
+        $userToPromote->admin = 1;
+        $userToPromote->save();
+
+        $request->session()->flash('successMsg', 'User promoted succesufully!');
+        return $this->listAllUsersToAdmin($request);
+    }
+
+    public function demoteUser(Request $request, $user) {
+        $userToDemote = User::findOrFail($user);
+        if (Auth::user()->id == $userToDemote->id) {
+           // abort(403, "unauthorized");
+            $pagetitle = "Unauthorized";
+            return Response::make(view('errors.403', compact('pagetitle')), 403);
+        }
+        if ($userToDemote->admin == 0) {
+            $request->session()->flash('errorMsg', 'User is already not admin!');
+            return $this->listAllUsersToAdmin($request);
+        };
+        $userToDemote->admin = 0;
+        $userToDemote->save();
+
+        $request->session()->flash('successMsg', 'User demoted succesufully!');
+        return $this->listAllUsersToAdmin($request);
     }
 
     public function getProfile($name) {

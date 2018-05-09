@@ -20,18 +20,36 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 
 //US5, US6
-Route::get('/users', 'UserController@listAllUsersToAdmin')->middleware('can:admin')->name('list.of.all.users');
-//Route::get('/users', 'UserController@listAllUsersToAdmin')->middleware('admin')->name('list.of.all.users');
+//Route::get('/users', 'UserController@listAllUsersToAdmin')->middleware('can:admin')->name('list.of.all.users');
+Route::get('/users', 'UserController@listAllUsersToAdmin')->middleware('admin')->name('list.of.all.users');
 
-Route::patch('/users/{user}/block', 'UserController@blockUser')->name('block.user');
+Route::get('/users/{user}/block', 'UserController@blockUser')->middleware('admin')->name('block.user');
+Route::patch('/users/{user}/block', 'UserController@blockUser')->middleware('admin')->name('block.user');
 
-Route::patch('/users/{user}/unblock', 'UserController@unblockUser')->name('unblock.user');
+Route::get('/users/{user}/unblock', 'UserController@unblockUser')->middleware('admin')->name('unblock.user');
+Route::patch('/users/{user}/unblock', 'UserController@unblockUser')->middleware('admin')->name('unblock.user');
 
  // promove user para admin
-Route::patch('/users/{user}/promote', 'UserController@promoteUser')->name('promote.user');
+Route::get('/users/{user}/promote', 'UserController@promoteUser')->middleware('admin')->name('promote.user');
+Route::patch('/users/{user}/promote', 'UserController@promoteUser')->middleware('admin')->name('promote.user');
 
   // tira admin do user
-Route::patch('/users/{user}/demote', 'UserController@demoteUser')->name('demote.user');
+Route::get('/users/{user}/demote', 'UserController@demoteUser')->middleware('admin')->name('demote.user');
+Route::patch('/users/{user}/demote', 'UserController@demoteUser')->middleware('admin')->name('demote.user');
+
+/*Route::get('/users/{user}/block', 'UserController@blockUser')->middleware('can:admin')->name('block.user');
+Route::patch('/users/{user}/block', 'UserController@blockUser')->middleware('can:admin')->name('block.user');
+
+Route::get('/users/{user}/unblock', 'UserController@unblockUser')->middleware('can:admin')->name('unblock.user');
+Route::patch('/users/{user}/unblock', 'UserController@unblockUser')->middleware('can:admin')->name('unblock.user');
+
+ // promove user para admin
+Route::get('/users/{user}/promote', 'UserController@promoteUser')->middleware('can:admin')->name('promote.user');
+Route::patch('/users/{user}/promote', 'UserController@promoteUser')->middleware('can:admin')->name('promote.user');
+
+  // tira admin do user
+Route::get('/users/{user}/demote', 'UserController@demoteUser')->middleware('can:admin')->name('demote.user');
+Route::patch('/users/{user}/demote', 'UserController@demoteUser')->middleware('can:admin')->name('demote.user'); */
 
 Route::patch('/me/password', 'UserController@changePassword')->name('me.password');
 

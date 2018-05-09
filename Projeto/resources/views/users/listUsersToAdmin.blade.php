@@ -1,5 +1,18 @@
 @extends('master')
 @section('content')
+
+@if(Session::has('errorMsg'))
+    @alert(['type' => 'danger','title'=>'Warning!'])
+        {{session('errorMsg')}}
+    @endalert
+
+    @elseif(Session::has('successMsg'))
+        @alert(['type' => 'success','title'=>'Success!'])
+            {{session('successMsg')}}
+        @endalert
+@endif
+
+
 <div class="container-fluid bg-secondary text-light">
     <h4>Filter User</h4>
     <form action="{{ route('list.of.all.users') }}" method="get" class="form-inline">
@@ -34,6 +47,7 @@
             <th>Email</th>
             <th>Admin</th>
             <th>Blocked</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -51,7 +65,49 @@
                     Sim 
                  @else 
                     Não
-                 @endif 
+                 @endif                  
+              </td>
+              <td>
+                @if($user == Auth::user())
+
+                @else 
+                    <div class='col-xs-3'>
+                    @if($user->blocked == 1)
+                        
+                        <form action="{{ action('UserController@unblockUser', $user->id) }}" method="POST" role="form" class="btn-block">
+                        @csrf
+                        @method('patch')
+                        <input type="hidden" name="user_id" value="{{ $user->id }} ?>">
+                        <button type="submit" class="btn btn-xs btn-secondary btn-block">Unblock</button>
+                        </form>
+                     @else 
+                        <form action="{{ action('UserController@blockUser', $user->id) }}" method="POST" role="form" class="btn-block">
+                        @csrf
+                        @method('patch')
+                        <input type="hidden" name="user_id" value="{{ $user->id }} ?>">
+                        <button type="submit" class="btn btn-xs btn-secondary btn-block">Block</button>
+                        </form> 
+                     @endif   
+                     {{-- parte do demote --}}
+                     @if($user->admin == 1)
+                        <form action="{{ action('UserController@demoteUser', $user->id) }}" method="POST" role="form" class="btn-block">
+                        @csrf
+                        @method('patch')
+                        <input type="hidden" name="user_id" value="{{ $user->id }} ?>">
+                        <button type="submit" class="btn btn-xs btn-secondary btn-block">Demote</button>
+                        </form>
+                     @else 
+                        <form action="{{ action('UserController@promoteUser', $user->id) }}" method="POST" role="form" class="btn-block">
+                        @csrf
+                        @method('patch')
+                        <input type="hidden" name="user_id" value="{{ $user->id }} ?>">
+                        <button type="submit" class="btn btn-xs btn-secondary btn-block">Promote</button>
+                        </form>
+                        
+
+                     @endif 
+                     </div>
+                @endif
               </td>
         </tr>
         @endforeach
