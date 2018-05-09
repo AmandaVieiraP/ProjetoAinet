@@ -51,6 +51,10 @@ Route::patch('/users/{user}/promote', 'UserController@promoteUser')->middleware(
 Route::get('/users/{user}/demote', 'UserController@demoteUser')->middleware('can:admin')->name('demote.user');
 Route::patch('/users/{user}/demote', 'UserController@demoteUser')->middleware('can:admin')->name('demote.user'); */
 
+//US9
+//acrescentei esta rota apenas para mostrar o formulario
+Route::get('/me/password','UserController@showChangePasswordForm')->name('me.passwordForm');
+
 Route::patch('/me/password', 'UserController@changePassword')->name('me.password');
 
  // mudar perfil 
