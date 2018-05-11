@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Support\Facades\Storage;
+
 
 class RegisterController extends Controller
 {
@@ -48,10 +50,13 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
+        
         return Validator::make($data, [
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|regex:/^[A-Za-z\s-]+$/',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6|confirmed',
+            'password' => 'required|string|min:3|confirmed',
+            'phone' => 'nullable|string|unique:users|regex:/^(\+\d{2,3})?\s*\d{3}\s*\d{3}\s*\d{3}$/',
+            'profile_photo' => 'nullable|image',
         ]);
     }
 
@@ -63,10 +68,21 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
+
+
+        if(isset($data['profile_photo'])){
+           $imagem= $data['profile_photo'];
+           $nome = basename($imagem->store('profiles', 'public'));
+        }else{
+            $nome= null;
+        }
+
+        return $user= User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-        ]);
+            'phone' => $data['phone'] ?? null,
+            'profile_photo' => $nome,
+        ]);        
     }
 }
