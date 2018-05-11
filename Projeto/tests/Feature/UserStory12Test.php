@@ -35,7 +35,7 @@ class UserStory12Test extends UserStoryTestCase
         // Arrange, Act, Assert
         $this->seedTestUsers();
 
-        $this->get('/associates')
+        $this->get('/me/associates')
             ->assertRedirect('/login');
     }
 
@@ -48,7 +48,7 @@ class UserStory12Test extends UserStoryTestCase
         $this->seedTestUsers();
 
         $this->response = $this->actingAs($this->mainUser)
-            ->get('/associates')
+            ->get('/me/associates')
             ->assertStatus(200)
             ->assertDontSeeAll([
                 '2d9e08d0', '836d2620', 'a90eb144', 'b46c85c9', 'rootiam',
@@ -71,7 +71,7 @@ class UserStory12Test extends UserStoryTestCase
         ]);
 
         $this->actingAs($this->mainUser)
-            ->get('/associates')
+            ->get('/me/associates')
             ->assertStatus(200)
             ->assertSeeAll([
                 '2d9e08d0', '836d2620',
@@ -100,7 +100,7 @@ class UserStory12Test extends UserStoryTestCase
         ]);
 
         $this->actingAs($this->adminUser)
-            ->get('/associates')
+            ->get('/me/associates')
             ->assertStatus(200)
             ->assertSeeAll([
                 '2d9e08d0', '836d2620',
@@ -126,7 +126,7 @@ class UserStory12Test extends UserStoryTestCase
         ]);
 
         $this->actingAs($this->mainUser)
-            ->get('/associates')
+            ->get('/me/associates')
             ->assertStatus(200)
             ->assertSeeAll([
                 '2d9e08d0',

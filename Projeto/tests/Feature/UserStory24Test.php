@@ -86,7 +86,7 @@ class UserStory24Test extends BaseAccountsTest
 
         $this->actingAs($this->mainUser)
             ->delete('/document/'.$document->id)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseHas('movements', [
             'id' => $movement->id,
@@ -118,7 +118,7 @@ class UserStory24Test extends BaseAccountsTest
 
         $this->actingAs($this->adminUser)
             ->delete('/document/'.$document->id)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseHas('movements', [
             'id' => $movement->id,
@@ -151,7 +151,7 @@ class UserStory24Test extends BaseAccountsTest
         $movement = $movements->first();
         $this->actingAs($this->mainUser)
             ->delete('/document/'.$document1->id)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseHas('movements', [
             'id' => $movement->id,

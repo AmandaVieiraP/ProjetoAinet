@@ -37,41 +37,23 @@ Route::patch('/users/{user}/promote', 'UserController@promoteUser')->middleware(
 Route::get('/users/{user}/demote', 'UserController@demoteUser')->middleware('admin')->name('demote.user');
 Route::patch('/users/{user}/demote', 'UserController@demoteUser')->middleware('admin')->name('demote.user');
 
-/*Route::get('/users/{user}/block', 'UserController@blockUser')->middleware('can:admin')->name('block.user');
-Route::patch('/users/{user}/block', 'UserController@blockUser')->middleware('can:admin')->name('block.user');
-
-Route::get('/users/{user}/unblock', 'UserController@unblockUser')->middleware('can:admin')->name('unblock.user');
-Route::patch('/users/{user}/unblock', 'UserController@unblockUser')->middleware('can:admin')->name('unblock.user');
-
- // promove user para admin
-Route::get('/users/{user}/promote', 'UserController@promoteUser')->middleware('can:admin')->name('promote.user');
-Route::patch('/users/{user}/promote', 'UserController@promoteUser')->middleware('can:admin')->name('promote.user');
-
-  // tira admin do user
-Route::get('/users/{user}/demote', 'UserController@demoteUser')->middleware('can:admin')->name('demote.user');
-Route::patch('/users/{user}/demote', 'UserController@demoteUser')->middleware('can:admin')->name('demote.user'); */
-
-//US9
-//acrescentei esta rota apenas para mostrar o formulario
-Route::get('/me/password','UserController@showChangePasswordForm')->name('me.passwordForm');
-
 Route::patch('/me/password', 'UserController@changePassword')->name('me.password');
 
  // mudar perfil 
 Route::patch('/me/profile', 'UserController@meProfile')->name('me.profile');
 
-Route::get('profiles/{name}', 'UserController@getProfile')->name('users.profiles');
+Route::get('/profiles', 'UserController@getProfile')->middleware('auth')->name('users.profiles');
 //US - 12
-Route::get('me/associates', 'UserController@getAssociates')->name('users.associates');
-Route::get('me/associate-of','UserController@getAssociateOfMe')->name('me.associateOf');
-Route::get('accounts/{user}','AccountController@showAccount')->name('account');
-Route::get('accounts/{user}/opened','AccountController@showOpenAccount')->name('openedAcounts');
-Route::get('accounts/{user}/closed','AccountController@showCloseAccount')->name('account.closed');
-Route::delete('account/{account}', 'AccountController@destroy')->name('account.delete');
-Route::patch('account/{account}/close','AccountController@updateClose')->name('account.close');
-Route::patch('account/{account}/reopen','AccountController@updateReopen')->name('account.reopen');
-Route::post('account','AccountController@store')->name('accounts.store');
-Route::put('account/{account}','AccountController@update')->name('accounts.editAccount');
+Route::get('/me/associates', 'UserController@getAssociates')->name('users.associates');
+Route::get('/me/associate-of','UserController@getAssociateOfMe')->name('me.associateOf');
+Route::get('/accounts/{user}','AccountController@showAccount')->name('account');
+Route::get('/accounts/{user}/opened','AccountController@showOpenAccount')->name('openedAcounts');
+Route::get('/accounts/{user}/closed','AccountController@showCloseAccount')->name('account.closed');
+Route::delete('/account/{account}', 'AccountController@destroy')->name('account.delete');
+Route::patch('/account/{account}/close','AccountController@updateClose')->name('account.close');
+Route::patch('/account/{account}/reopen','AccountController@updateReopen')->name('account.reopen');
+Route::post('/account','AccountController@store')->name('accounts.store');
+Route::put('/account/{account}','AccountController@update')->name('accounts.editAccount');
 
 //US.20
 Route::get('/movements/{account}','MovementController@index')->name('movements.index');

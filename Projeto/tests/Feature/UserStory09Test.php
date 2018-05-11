@@ -111,7 +111,7 @@ class UserStory09Test extends UserStoryTestCase
                 'password' => 'xyz',
                 'password_confirmation' => 'xyz',
             ])
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->mainUser->refresh();
         $this->assertTrue(Hash::check('xyz', $this->mainUser->password));
@@ -131,7 +131,7 @@ class UserStory09Test extends UserStoryTestCase
                 'password' => 'xyz',
                 'password_confirmation' => 'xyz',
             ])
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->adminUser->refresh();
         $this->assertTrue(Hash::check('xyz', $this->adminUser->password));

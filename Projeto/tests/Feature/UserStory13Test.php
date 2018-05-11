@@ -36,7 +36,7 @@ class UserStory13Test extends UserStoryTestCase
         // Arrange, Act, Assert
         $this->seedTestUsers();
 
-        $this->get('/associate-of')
+        $this->get('me/associate-of')
             ->assertRedirect('/login');
     }
 
@@ -49,7 +49,7 @@ class UserStory13Test extends UserStoryTestCase
         $this->seedTestUsers();
 
         $this->response = $this->actingAs($this->mainUser)
-            ->get('/associate-of')
+            ->get('me/associate-of')
             ->assertStatus(200)
             ->assertDontSeeAll([
                 '2d9e08d0', '836d2620', 'a90eb144', 'b46c85c9', 'rootiam',
@@ -72,7 +72,7 @@ class UserStory13Test extends UserStoryTestCase
         ]);
 
         $this->actingAs($this->mainUser)
-            ->get('/associate-of')
+            ->get('me/associate-of')
             ->assertStatus(200)
             ->assertSeeAll([
                 '2d9e08d0', '836d2620',
@@ -99,7 +99,7 @@ class UserStory13Test extends UserStoryTestCase
         ]);
 
         $this->actingAs($this->adminUser)
-            ->get('/associate-of')
+            ->get('me/associate-of')
             ->assertStatus(200)
             ->assertSeeAll([
                 '2d9e08d0', '836d2620',
@@ -126,7 +126,7 @@ class UserStory13Test extends UserStoryTestCase
         ]);
 
         $this->actingAs($this->mainUser)
-            ->get('/associate-of')
+            ->get('me/associate-of')
             ->assertStatus(200)
             ->assertSeeAll([
                 '2d9e08d0',
@@ -158,7 +158,7 @@ class UserStory13Test extends UserStoryTestCase
         ]);
 
         $this->actingAs($this->mainUser)
-            ->get('/associate-of')
+            ->get('me/associate-of')
             ->assertStatus(200)
             ->assertSeeAll([
                 'href="'.url('/accounts/'.$user1->id).'"',

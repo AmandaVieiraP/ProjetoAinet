@@ -48,7 +48,7 @@ class UserStory15ATest extends BaseAccountsTest
 
         $this->actingAs($this->mainUser)
             ->delete('/account/'.$account->id)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseMissing('accounts', ['id' => $account->id]);
     }
@@ -63,7 +63,7 @@ class UserStory15ATest extends BaseAccountsTest
 
         $this->actingAs($this->adminUser)
             ->delete('/account/'.$account->id)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseMissing('accounts', ['id' => $account->id]);
     }

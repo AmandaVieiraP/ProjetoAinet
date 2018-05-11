@@ -96,7 +96,7 @@ class UserStory30Test extends UserStoryTestCase
         DB::table('associate_members')->insert($data);
         $this->actingAs($this->mainUser)
             ->delete('/me/associates/'.$this->users[0]->id)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseMissing('associate_members', $data);
         foreach ($keep as $row) {
@@ -133,7 +133,7 @@ class UserStory30Test extends UserStoryTestCase
         DB::table('associate_members')->insert($data);
         $this->actingAs($this->adminUser)
             ->delete('/me/associates/'.$this->users[0]->id)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseMissing('associate_members', $data);
         foreach ($keep as $row) {

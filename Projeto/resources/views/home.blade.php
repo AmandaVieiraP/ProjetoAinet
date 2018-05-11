@@ -1,13 +1,7 @@
 @extends('master')
+
 @section('content')
 <div class="container">
-
-    @if (session('success'))
-    @alert(['type' => 'success','title'=>'Success'])
-        {{ session('success') }}
-    @endalert
-    @endif
-
     <div class="row justify-content-left">
         <div class="card-header">Foto</div>
         <div class="card">

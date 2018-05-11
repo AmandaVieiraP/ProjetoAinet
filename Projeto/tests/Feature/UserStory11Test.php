@@ -91,7 +91,7 @@ class UserStory11Test extends UserStoryTestCase
 
         $this->response = $this->actingAs($this->mainUser)
             ->get('/profiles')
-            ->assertSee(asset('storage/'.$name));
+            ->assertSee(asset('storage/profiles/'.$name));
     }
 
     // @codingStandardsIgnoreStart

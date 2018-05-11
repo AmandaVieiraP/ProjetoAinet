@@ -34,7 +34,7 @@ class UserStory19Test extends BaseAccountsTest
 
         $this->actingAs($this->mainUser)
             ->put('/account/'.$account->id, $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseHas('accounts', [
             'id' => $account->id,
@@ -65,7 +65,7 @@ class UserStory19Test extends BaseAccountsTest
 
         $this->actingAs($this->mainUser)
             ->put('/account/'.$account->id, $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseHas('accounts', [
             'id' => $account->id,
@@ -99,7 +99,7 @@ class UserStory19Test extends BaseAccountsTest
 
         $this->actingAs($this->mainUser)
             ->put('/account/'.$account->id, $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseHas('accounts', [
             'id' => $account->id,
@@ -133,7 +133,7 @@ class UserStory19Test extends BaseAccountsTest
 
         $this->actingAs($this->mainUser)
             ->put('/account/'.$account->id, $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseHas('accounts', [
             'id' => $account->id,
@@ -174,7 +174,7 @@ class UserStory19Test extends BaseAccountsTest
 
         $this->actingAs($this->mainUser)
             ->put('/account/'.$account->id, $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseHas('accounts', [
             'id' => $account->id,
@@ -208,7 +208,7 @@ class UserStory19Test extends BaseAccountsTest
 
         $this->actingAs($this->mainUser)
             ->put('/account/'.$account->id, $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseHas('accounts', [
             'id' => $account->id,
@@ -242,7 +242,7 @@ class UserStory19Test extends BaseAccountsTest
 
         $this->actingAs($this->mainUser)
             ->put('/account/'.$account->id, $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseHas('accounts', [
             'id' => $account->id,
@@ -283,7 +283,7 @@ class UserStory19Test extends BaseAccountsTest
 
         $this->actingAs($this->mainUser)
             ->put('/account/'.$account->id, $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseHas('accounts', [
             'id' => $account->id,
@@ -317,7 +317,7 @@ class UserStory19Test extends BaseAccountsTest
 
         $this->actingAs($this->mainUser)
             ->put('/account/'.$account->id, $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseHas('accounts', [
             'id' => $account->id,

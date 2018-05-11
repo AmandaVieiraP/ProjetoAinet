@@ -70,7 +70,7 @@ class UserStory21CTest extends BaseAccountsTest
 
         $this->actingAs($this->mainUser)
             ->delete('/movement/'.$movement->id)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseMissing('movements', [
             'id' => $movement->id
@@ -90,7 +90,7 @@ class UserStory21CTest extends BaseAccountsTest
 
         $this->actingAs($this->adminUser)
             ->delete('/movement/'.$movement->id)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseMissing('movements', [
             'id' => $movement->id
@@ -115,7 +115,7 @@ class UserStory21CTest extends BaseAccountsTest
         $movement = $movements->first();
         $this->actingAs($this->mainUser)
             ->delete('/movement/'.$movement->id)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseMissing('movements', [
             'id' => $movement->id

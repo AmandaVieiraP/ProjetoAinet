@@ -154,7 +154,7 @@ class UserStory17Test extends BaseAccountsTest
 
         $this->actingAs($this->mainUser)
             ->post('/account', $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $data['owner_id'] = $this->mainUser->id;
         $data['current_balance'] = $data['start_balance'];
@@ -178,7 +178,7 @@ class UserStory17Test extends BaseAccountsTest
 
         $this->actingAs($this->mainUser)
             ->post('/account', $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $data['owner_id'] = $this->mainUser->id;
         $data['current_balance'] = $data['start_balance'];
@@ -202,7 +202,7 @@ class UserStory17Test extends BaseAccountsTest
 
         $this->actingAs($this->mainUser)
             ->post('/account', $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $data['owner_id'] = $this->mainUser->id;
         $data['current_balance'] = $data['start_balance'];
@@ -227,7 +227,7 @@ class UserStory17Test extends BaseAccountsTest
 
         $this->actingAs($this->mainUser)
             ->post('/account', $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $data['owner_id'] = $this->mainUser->id;
         $data['current_balance'] = $data['start_balance'];
@@ -252,7 +252,7 @@ class UserStory17Test extends BaseAccountsTest
 
         $this->actingAs($this->mainUser)
             ->post('/account', $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $data['owner_id'] = $this->mainUser->id;
         $data['current_balance'] = $data['start_balance'];
@@ -276,7 +276,7 @@ class UserStory17Test extends BaseAccountsTest
 
         $this->actingAs($this->adminUser)
             ->post('/account', $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $data['owner_id'] = $this->adminUser->id;
         $data['current_balance'] = $data['start_balance'];
@@ -302,7 +302,7 @@ class UserStory17Test extends BaseAccountsTest
 
         $this->actingAs($this->mainUser)
             ->post('/account', $data)
-            ->assertSuccessful()
+            ->assertSuccessfulOrRedirect()
             ->assertSessionHasNoErrors('account_type_id');
 
         $this->assertDatabaseHas('accounts', $data);
@@ -324,7 +324,7 @@ class UserStory17Test extends BaseAccountsTest
         ];
         $this->actingAs($this->mainUser)
             ->post('/account', $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $data['owner_id'] = $this->mainUser->id;
 
@@ -347,7 +347,7 @@ class UserStory17Test extends BaseAccountsTest
         ];
         $this->actingAs($this->mainUser)
             ->post('/account', $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $data['current_balance'] = 1;
 
@@ -370,7 +370,7 @@ class UserStory17Test extends BaseAccountsTest
         ];
         $this->actingAs($this->mainUser)
             ->post('/account', $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $data['last_movement_date'] = null;
 
@@ -393,7 +393,7 @@ class UserStory17Test extends BaseAccountsTest
         ];
         $this->actingAs($this->mainUser)
             ->post('/account', $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $data['deleted_at'] = null;
 

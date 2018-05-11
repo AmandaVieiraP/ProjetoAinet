@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Model;
 
 class User extends Authenticatable
 {
@@ -26,4 +27,14 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    public function associated_of() {
+        return $this->belongsToMany(User::class, 'associate_members', 'associated_user_id', 'main_user_id')->withPivot('created_at');
+    }
+    
+    public function associateds() {
+        return $this->belongsToMany(User::class, 'associate_members', 'main_user_id', 'associated_user_id')->withPivot('created_at');
+    }
+
+    
 }

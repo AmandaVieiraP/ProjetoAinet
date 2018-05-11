@@ -52,7 +52,7 @@ class UserStory16Test extends BaseAccountsTest
 
         $this->actingAs($this->mainUser)
             ->patch('/account/'.$account->id.'/reopen')
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseHas('accounts', [
             'id' => $account->id,
@@ -72,7 +72,7 @@ class UserStory16Test extends BaseAccountsTest
 
         $this->actingAs($this->adminUser)
             ->patch('/account/'.$account->id.'/reopen')
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseHas('accounts', [
             'id' => $account->id,

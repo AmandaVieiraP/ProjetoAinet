@@ -30,7 +30,7 @@ class UserStory22ATest extends UserStory22Test
         }
         $this->actingAs($this->mainUser)
             ->post('/movements/'.$this->account->id.'/create', $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         if ($skipAssert) {
             $this->stopQueryLogging();

@@ -183,7 +183,7 @@ class UserStory18Test extends BaseAccountsTest
 
         $this->actingAs($this->mainUser)
             ->put('/account/'.$account->id, $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseHas('accounts', ['id' => $account->id, 'account_type_id' => $data['account_type_id']]);
     }
@@ -205,7 +205,7 @@ class UserStory18Test extends BaseAccountsTest
 
         $this->actingAs($this->mainUser)
             ->put('/account/'.$account->id, $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseHas('accounts', ['id' => $account->id, 'account_type_id' => $data['account_type_id']]);
     }
@@ -228,7 +228,7 @@ class UserStory18Test extends BaseAccountsTest
 
         $this->actingAs($this->mainUser)
             ->put('/account/'.$account->id, $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseHas('accounts', ['id' => $account->id, 'code' => $data['code']]);
     }
@@ -250,7 +250,7 @@ class UserStory18Test extends BaseAccountsTest
 
         $this->actingAs($this->mainUser)
             ->put('/account/'.$account->id, $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseHas('accounts', ['id' => $account->id, 'code' => $data['code']]);
     }
@@ -273,7 +273,7 @@ class UserStory18Test extends BaseAccountsTest
 
         $this->actingAs($this->mainUser)
             ->put('/account/'.$account->id, $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseHas('accounts', ['id' => $account->id, 'date' => $data['date']]);
     }
@@ -295,7 +295,7 @@ class UserStory18Test extends BaseAccountsTest
 
         $this->actingAs($this->mainUser)
             ->put('/account/'.$account->id, $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseHas('accounts', ['id' => $account->id, 'start_balance' => $data['start_balance']]);
     }
@@ -318,7 +318,7 @@ class UserStory18Test extends BaseAccountsTest
 
         $this->actingAs($this->mainUser)
             ->put('/account/'.$account->id, $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseHas('accounts', ['id' => $account->id, 'description' => $data['description']]);
     }
@@ -341,7 +341,7 @@ class UserStory18Test extends BaseAccountsTest
 
         $this->actingAs($this->adminUser)
             ->put('/account/'.$account->id, $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseHas('accounts', ['id' => $account->id, 'description' => $data['description']]);
     }

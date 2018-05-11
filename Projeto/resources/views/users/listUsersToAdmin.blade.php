@@ -41,75 +41,73 @@
 </div>
 @if (count($users))
     <table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Admin</th>
-            <th>Blocked</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach ($users as $user)    
-        <tr>
-            <td>{{ $user->name}}</td>
-            <td>{{ $user->email}}</td>
-            <td> @if($user->admin == 1)
-                    Sim 
-                 @else 
-                    Não
-                 @endif 
-              </td>
-            <td> @if($user->blocked == 1)
-                    Sim 
-                 @else 
-                    Não
-                 @endif                  
-              </td>
-              <td>
-                @if($user == Auth::user())
-
-                @else 
-                    <div class='col-xs-3'>
-                    @if($user->blocked == 1)
-                        
-                        <form action="{{ action('UserController@unblockUser', $user->id) }}" method="POST" role="form" class="btn-block">
-                        @csrf
-                        @method('patch')
-                        <input type="hidden" name="user_id" value="{{ $user->id }} ?>">
-                        <button type="submit" class="btn btn-xs btn-secondary btn-block">Unblock</button>
-                        </form>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Admin</th>
+                <th>Blocked</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach ($users as $user)    
+            <tr>
+                <td>{{ $user->name}}</td>
+                <td>{{ $user->email}}</td>
+                <td> @if($user->admin == 1)
+                        Admin
                      @else 
-                        <form action="{{ action('UserController@blockUser', $user->id) }}" method="POST" role="form" class="btn-block">
-                        @csrf
-                        @method('patch')
-                        <input type="hidden" name="user_id" value="{{ $user->id }} ?>">
-                        <button type="submit" class="btn btn-xs btn-secondary btn-block">Block</button>
-                        </form> 
-                     @endif   
-                     {{-- parte do demote --}}
-                     @if($user->admin == 1)
-                        <form action="{{ action('UserController@demoteUser', $user->id) }}" method="POST" role="form" class="btn-block">
-                        @csrf
-                        @method('patch')
-                        <input type="hidden" name="user_id" value="{{ $user->id }} ?>">
-                        <button type="submit" class="btn btn-xs btn-secondary btn-block">Demote</button>
-                        </form>
-                     @else 
-                        <form action="{{ action('UserController@promoteUser', $user->id) }}" method="POST" role="form" class="btn-block">
-                        @csrf
-                        @method('patch')
-                        <input type="hidden" name="user_id" value="{{ $user->id }} ?>">
-                        <button type="submit" class="btn btn-xs btn-secondary btn-block">Promote</button>
-                        </form>
-                        
-
+                        Not Admin
                      @endif 
-                     </div>
-                @endif
-              </td>
-        </tr>
+                  </td>
+                <td> @if($user->blocked == 1)
+                        Blocked 
+                     @else 
+                        Unblocked
+                     @endif                  
+                  </td>
+                  <td>
+                    @if($user == Auth::user())
+
+                    @else 
+                        <div class='col-xs-3'>
+                        @if($user->blocked == 1)
+                            
+                            <form action="{{ action('UserController@unblockUser', $user->id) }}" method="POST" role="form" class="btn-block">
+                            @csrf
+                            @method('patch')
+                            <input type="hidden" name="user_id" value="{{ $user->id }} ?>">
+                            <button type="submit" class="btn btn-xs btn-secondary btn-block">Unblock</button>
+                            </form>
+                         @else 
+                            <form action="{{ action('UserController@blockUser', $user->id) }}" method="POST" role="form" class="btn-block">
+                            @csrf
+                            @method('patch')
+                            <input type="hidden" name="user_id" value="{{ $user->id }} ?>">
+                            <button type="submit" class="btn btn-xs btn-secondary btn-block">Block</button>
+                            </form> 
+                         @endif   
+                         {{-- parte do demote --}}
+                         @if($user->admin == 1)
+                            <form action="{{ action('UserController@demoteUser', $user->id) }}" method="POST" role="form" class="btn-block">
+                            @csrf
+                            @method('patch')
+                            <input type="hidden" name="user_id" value="{{ $user->id }} ?>">
+                            <button type="submit" class="btn btn-xs btn-secondary btn-block">Demote</button>
+                            </form>
+                         @else 
+                            <form action="{{ action('UserController@promoteUser', $user->id) }}" method="POST" role="form" class="btn-block">
+                            @csrf
+                            @method('patch')
+                            <input type="hidden" name="user_id" value="{{ $user->id }} ?>">
+                            <button type="submit" class="btn btn-xs btn-secondary btn-block">Promote</button>
+                            </form>        
+                         @endif 
+                         </div>
+                    @endif
+                  </td>
+            </tr>
         @endforeach
     </table>
     

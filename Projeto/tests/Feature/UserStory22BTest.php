@@ -39,7 +39,7 @@ class UserStory22BTest extends UserStory22Test
         }
         $this->actingAs($this->mainUser)
             ->put('/movement/'.$movement->id, $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         if ($skipAssert) {
             $this->stopQueryLogging();

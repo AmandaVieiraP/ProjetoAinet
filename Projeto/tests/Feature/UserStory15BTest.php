@@ -48,7 +48,7 @@ class UserStory15BTest extends BaseAccountsTest
 
         $this->actingAs($this->mainUser)
             ->patch('/account/'.$account->id.'/close')
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertSoftDeleted('accounts', ['id' => $account->id]);
     }
@@ -63,7 +63,7 @@ class UserStory15BTest extends BaseAccountsTest
 
         $this->actingAs($this->adminUser)
             ->patch('/account/'.$account->id.'/close')
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertSoftDeleted('accounts', ['id' => $account->id]);
     }

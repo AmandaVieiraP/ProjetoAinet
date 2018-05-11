@@ -100,7 +100,7 @@ class UserStory29Test extends UserStoryTestCase
         $data = ['associated_user' => $this->users[0]->id];
         $this->actingAs($this->mainUser)
             ->post('/me/associates', $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseHas('associate_members', [
             'main_user_id' => $this->mainUser->id,
@@ -121,7 +121,7 @@ class UserStory29Test extends UserStoryTestCase
         $data = ['associated_user' => $this->users[2]->id];
         $this->actingAs($this->mainUser)
             ->post('/me/associates', $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseHas('associate_members', [
             'main_user_id' => $this->mainUser->id,
@@ -142,7 +142,7 @@ class UserStory29Test extends UserStoryTestCase
         $data = ['associated_user' => $this->users[1]->id];
         $this->actingAs($this->mainUser)
             ->post('/me/associates', $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseHas('associate_members', [
             'main_user_id' => $this->mainUser->id,
@@ -163,7 +163,7 @@ class UserStory29Test extends UserStoryTestCase
         $data = ['associated_user' => $this->users[0]->id];
         $this->actingAs($this->adminUser)
             ->post('/me/associates', $data)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $this->assertDatabaseHas('associate_members', [
             'main_user_id' => $this->adminUser->id,

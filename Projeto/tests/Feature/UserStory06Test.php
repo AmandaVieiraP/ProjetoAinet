@@ -26,7 +26,6 @@ class UserStory06Test extends UserStoryTestCase
 
     // @codingStandardsIgnoreStart
     /** @test */
-    //suportado
     public function users_index_supports_empty_name_filter()
     {
         // @codingStandardsIgnoreEnd
@@ -45,7 +44,6 @@ class UserStory06Test extends UserStoryTestCase
 
     // @codingStandardsIgnoreStart
     /** @test */
-    //falhou ???
     public function users_index_supports_full_name_filter()
     {
         // @codingStandardsIgnoreEnd
@@ -61,7 +59,6 @@ class UserStory06Test extends UserStoryTestCase
 
     // @codingStandardsIgnoreStart
     /** @test */
-    //falhou ???
     public function users_index_supports_partial_name_filter()
     {
         // @codingStandardsIgnoreEnd
@@ -79,7 +76,6 @@ class UserStory06Test extends UserStoryTestCase
 
     // @codingStandardsIgnoreStart
     /** @test */
-    //suportado
     public function users_index_supports_empty_type_filter()
     {
         // @codingStandardsIgnoreEnd
@@ -98,7 +94,6 @@ class UserStory06Test extends UserStoryTestCase
 
     // @codingStandardsIgnoreStart
     /** @test */
-    //suportado
     public function users_index_ignores_invalid_type_filter()
     {
         // @codingStandardsIgnoreEnd
@@ -117,7 +112,6 @@ class UserStory06Test extends UserStoryTestCase
 
     // @codingStandardsIgnoreStart
     /** @test */
-    //falhou??
     public function users_index_supports_admin_type_filter()
     {
         // @codingStandardsIgnoreEnd
@@ -135,7 +129,6 @@ class UserStory06Test extends UserStoryTestCase
 
     // @codingStandardsIgnoreStart
     /** @test */
-    //falhou???
     public function users_index_supports_normal_type_filter()
     {
         // @codingStandardsIgnoreEnd
@@ -152,7 +145,6 @@ class UserStory06Test extends UserStoryTestCase
 
     // @codingStandardsIgnoreStart
     /** @test */
-    //suportado
     public function users_index_supports_empty_status_filter()
     {
         // @codingStandardsIgnoreEnd
@@ -171,7 +163,6 @@ class UserStory06Test extends UserStoryTestCase
 
     // @codingStandardsIgnoreStart
     /** @test */
-    //suportado
     public function users_index_ignores_invalid_status_filter()
     {
         // @codingStandardsIgnoreEnd
@@ -190,7 +181,6 @@ class UserStory06Test extends UserStoryTestCase
 
     // @codingStandardsIgnoreStart
     /** @test */
-    //falhou??
     public function users_index_supports_blocked_status_filter()
     {
         // @codingStandardsIgnoreEnd
@@ -207,7 +197,6 @@ class UserStory06Test extends UserStoryTestCase
 
     // @codingStandardsIgnoreStart
     /** @test */
-    //falhou??
     public function users_index_supports_unblocked_status_filter()
     {
         // @codingStandardsIgnoreEnd
@@ -225,7 +214,6 @@ class UserStory06Test extends UserStoryTestCase
 
     // @codingStandardsIgnoreStart
     /** @test */
-    //falhou??
     public function users_index_supports_name_and_type_filter()
     {
         // @codingStandardsIgnoreEnd
@@ -241,7 +229,6 @@ class UserStory06Test extends UserStoryTestCase
 
     // @codingStandardsIgnoreStart
     /** @test */
-    //falhou??
     public function users_index_supports_name_and_status_filter()
     {
         // @codingStandardsIgnoreEnd
@@ -257,7 +244,6 @@ class UserStory06Test extends UserStoryTestCase
 
     // @codingStandardsIgnoreStart
     /** @test */
-    //falhou??
     public function users_index_supports_name_and_type_and_status_filter()
     {
         // @codingStandardsIgnoreEnd

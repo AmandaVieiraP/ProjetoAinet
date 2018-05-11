@@ -27,7 +27,7 @@ class UserStory10Test extends UserStoryTestCase
         $this->seedMainUser();
 
         $this->actingAs($this->mainUser)
-            ->post('/me/profile')
+            ->put('/me/profile')
             ->assertSessionHasErrors(['email', 'name'])
             ->assertSessionHasNoErrors(['phone', 'profile_photo']);
     }
@@ -41,7 +41,7 @@ class UserStory10Test extends UserStoryTestCase
         $this->seedMainUser();
 
         $this->actingAs($this->mainUser)
-            ->post('/me/profile', [
+            ->put('/me/profile', [
                 'name' => 'name12345'
             ])
             ->assertSessionHasErrors('name');
@@ -56,7 +56,7 @@ class UserStory10Test extends UserStoryTestCase
         $this->seedMainUser();
 
         $this->actingAs($this->mainUser)
-            ->post('/me/profile', [
+            ->put('/me/profile', [
             'name' => 'name_'
             ])
             ->assertSessionHasErrors('name');
@@ -71,7 +71,7 @@ class UserStory10Test extends UserStoryTestCase
         $this->seedMainUser();
 
         $this->actingAs($this->mainUser)
-            ->post('/me/profile', [
+            ->put('/me/profile', [
                 'name' => '        '
             ])
             ->assertSessionHasErrors('name');
@@ -87,7 +87,7 @@ class UserStory10Test extends UserStoryTestCase
         $this->seedUser('teste', 'new@mail.pt');
 
         $this->actingAs($this->mainUser)
-            ->post('/me/profile', [
+            ->put('/me/profile', [
                 'email' => 'new@mail.pt'
             ])
             ->assertSessionHasErrors('email');
@@ -102,7 +102,7 @@ class UserStory10Test extends UserStoryTestCase
         $this->seedMainUser();
 
         $this->actingAs($this->mainUser)
-            ->post('/me/profile', [
+            ->put('/me/profile', [
                 'email' => 'user@mail'
             ])
             ->assertSessionHasErrors('email');
@@ -118,7 +118,7 @@ class UserStory10Test extends UserStoryTestCase
         $password = $this->mainUser->password;
 
         $this->actingAs($this->mainUser)
-            ->post('/me/profile', [
+            ->put('/me/profile', [
                 'email' => 'new@mail.pt',
                 'name' => 'letters and spaces',
             ])
@@ -141,7 +141,7 @@ class UserStory10Test extends UserStoryTestCase
         $email = $this->mainUser->email;
 
         $this->actingAs($this->mainUser)
-            ->post('/me/profile', [
+            ->put('/me/profile', [
                 'email' => $email,
                 'name' => 'letters and spaces',
             ])
@@ -163,7 +163,7 @@ class UserStory10Test extends UserStoryTestCase
         $password = $this->adminUser->password;
 
         $this->actingAs($this->adminUser)
-            ->post('/me/profile', [
+            ->put('/me/profile', [
                 'email' => 'new@mail.pt',
                 'name' => 'letters and spaces',
             ])
@@ -184,7 +184,7 @@ class UserStory10Test extends UserStoryTestCase
         $this->seedMainUser();
 
         $this->actingAs($this->mainUser)
-            ->post('/me/profile', [
+            ->put('/me/profile', [
                 'email' => 'new@mail.pt',
                 'name' => 'letters and spaces',
                 'phone' => '+sd 123 232'
@@ -201,7 +201,7 @@ class UserStory10Test extends UserStoryTestCase
         $this->seedMainUser();
 
         $this->actingAs($this->mainUser)
-            ->post('/me/profile', [
+            ->put('/me/profile', [
                 'email' => 'new@mail.pt',
                 'name' => 'letters and spaces',
                 'phone' => '+323 (123) 232'
@@ -219,7 +219,7 @@ class UserStory10Test extends UserStoryTestCase
         $password = $this->mainUser->password;
 
         $this->actingAs($this->mainUser)
-            ->post('/me/profile', [
+            ->put('/me/profile', [
                 'email' => 'new@mail.pt',
                 'name' => 'letters and spaces',
                 'phone' => '+351 244 800 900'
@@ -246,7 +246,7 @@ class UserStory10Test extends UserStoryTestCase
         $this->mainUser->save();
 
         $this->actingAs($this->mainUser)
-            ->post('/me/profile', [
+            ->put('/me/profile', [
                 'email' => 'new@mail.pt',
                 'name' => 'letters and spaces'
             ])
@@ -269,7 +269,7 @@ class UserStory10Test extends UserStoryTestCase
         $this->seedMainUser();
 
         $this->actingAs($this->mainUser)
-            ->post('/me/profile', [
+            ->put('/me/profile', [
                 'email' => 'new@mail.pt',
                 'name' => 'letters and spaces',
                 'profile_photo' => 'just text'
@@ -286,7 +286,7 @@ class UserStory10Test extends UserStoryTestCase
         $this->seedMainUser();
 
         $this->actingAs($this->mainUser)
-            ->post('/me/profile', [
+            ->put('/me/profile', [
                 'email' => 'new@mail.pt',
                 'name' => 'letters and spaces',
                 'profile_photo' => UploadedFile::fake()->create('document.pdf', 10)
@@ -306,7 +306,7 @@ class UserStory10Test extends UserStoryTestCase
         $file = UploadedFile::fake()->image('selfie.png');
 
         $this->actingAs($this->mainUser)
-            ->post('/me/profile', [
+            ->put('/me/profile', [
                 'email' => 'new@mail.pt',
                 'name' => 'letters and spaces',
                 'profile_photo' => $file
@@ -335,7 +335,7 @@ class UserStory10Test extends UserStoryTestCase
         $file = UploadedFile::fake()->image('selfie.jpg');
 
         $this->actingAs($this->mainUser)
-            ->post('/me/profile', [
+            ->put('/me/profile', [
                 'email' => 'new@mail.pt',
                 'name' => 'letters and spaces',
                 'profile_photo' => $file
@@ -372,7 +372,7 @@ class UserStory10Test extends UserStoryTestCase
         ]);
 
         $this->actingAs($this->mainUser)
-            ->post('/me/profile', [
+            ->put('/me/profile', [
                 'email' => 'new@mail.pt',
                 'name' => 'letters and spaces',
                 'profile_photo' => $file
@@ -411,7 +411,7 @@ class UserStory10Test extends UserStoryTestCase
 
 
         $this->actingAs($this->mainUser)
-            ->post('/me/profile', [
+            ->put('/me/profile', [
                 'email' => 'new@mail.pt',
                 'name' => 'letters and spaces',
             ])
@@ -437,7 +437,7 @@ class UserStory10Test extends UserStoryTestCase
         // Arrange, Act, Assert
         $this->seedMainUser();
 
-        $this->post('/me/profile', [
+        $this->put('/me/profile', [
                 'email' => 'new@mail.pt',
                 'name' => 'letters and spaces',
             ])

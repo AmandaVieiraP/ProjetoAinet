@@ -31,7 +31,7 @@ class UserStory22CTest extends UserStory22Test
         }
         $this->actingAs($this->mainUser)
             ->delete('/movement/'.$movement->id)
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         if ($skipAssert) {
             $this->stopQueryLogging();

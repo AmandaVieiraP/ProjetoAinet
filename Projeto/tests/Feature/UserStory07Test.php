@@ -49,7 +49,7 @@ class UserStory07Test extends UserStoryTestCase
 
         $this->actingAs($this->adminUser)
             ->patch("/users/{$user->id}/block")
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $user = User::where('email', 'user1@mail.pt')->first();
         $this->assertTrue((bool)$user->blocked, 'User is not blocked');
@@ -66,7 +66,7 @@ class UserStory07Test extends UserStoryTestCase
 
         $this->actingAs($this->adminUser)
             ->patch("/users/{$user->id}/block")
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $user = User::where('email', 'user3@mail.pt')->first();
         $this->assertTrue((bool)$user->blocked, 'User is not blocked');
@@ -97,7 +97,7 @@ class UserStory07Test extends UserStoryTestCase
 
         $this->actingAs($this->adminUser)
             ->patch("/users/{$user->id}/unblock")
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $user = User::where('email', 'user3@mail.pt')->first();
         $this->assertFalse((bool)$user->blocked, 'User is blocked');
@@ -115,7 +115,7 @@ class UserStory07Test extends UserStoryTestCase
 
         $this->actingAs($this->adminUser)
             ->patch("/users/{$user->id}/unblock")
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $user = User::where('email', 'user1@mail.pt')->first();
         $this->assertFalse((bool)$user->blocked, 'User is blocked');
@@ -145,7 +145,7 @@ class UserStory07Test extends UserStoryTestCase
 
         $this->actingAs($this->adminUser)
             ->patch("/users/{$user->id}/promote")
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $user = User::where('email', 'user1@mail.pt')->first();
         $this->assertTrue((bool)$user->admin, 'User is not admin');
@@ -162,7 +162,7 @@ class UserStory07Test extends UserStoryTestCase
 
         $this->actingAs($this->adminUser)
             ->patch("/users/{$user->id}/promote")
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $user = User::where('email', 'user4@mail.pt')->first();
         $this->assertTrue((bool)$user->admin, 'User is not admin');
@@ -193,7 +193,7 @@ class UserStory07Test extends UserStoryTestCase
 
         $this->actingAs($this->adminUser)
             ->patch("/users/{$user->id}/demote")
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $user = User::where('email', 'user4@mail.pt')->first();
         $this->assertFalse((bool)$user->admin, 'User is admin');
@@ -211,7 +211,7 @@ class UserStory07Test extends UserStoryTestCase
 
         $this->actingAs($this->adminUser)
             ->patch("/users/{$user->id}/demote")
-            ->assertSuccessful();
+            ->assertSuccessfulOrRedirect();
 
         $user = User::where('email', 'user1@mail.pt')->first();
         $this->assertFalse((bool)$user->admin, 'User is admin');
