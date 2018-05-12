@@ -16,6 +16,10 @@ Route::get('/', 'Controller@initialPage')->name('initial.page');
 
 //US2, US3, US4
 Auth::routes();
+//Override da rota Login, Register, Home para mudar a aparência do form
+Route::get('login','Auth\LoginController@showLoginForm')->name('login');
+
+Route::get('register', 'Auth\RegisterController@showRegistrationForm')->name('register');
 
 Route::get('/home', 'HomeController@index')->name('home');
 
@@ -23,6 +27,7 @@ Route::get('/home', 'HomeController@index')->name('home');
 //Route::get('/users', 'UserController@listAllUsersToAdmin')->middleware('can:admin')->name('list.of.all.users');
 Route::get('/users', 'UserController@listAllUsersToAdmin')->middleware('admin')->name('list.of.all.users');
 
+//US7
 Route::get('/users/{user}/block', 'UserController@blockUser')->middleware('admin')->name('block.user');
 Route::patch('/users/{user}/block', 'UserController@blockUser')->middleware('admin')->name('block.user');
 
@@ -37,14 +42,21 @@ Route::patch('/users/{user}/promote', 'UserController@promoteUser')->middleware(
 Route::get('/users/{user}/demote', 'UserController@demoteUser')->middleware('admin')->name('demote.user');
 Route::patch('/users/{user}/demote', 'UserController@demoteUser')->middleware('admin')->name('demote.user');
 
+//US9
+//acrescentei esta rota apenas para mostrar o formulario
+Route::get('/me/password','UserController@showChangePasswordForm')->name('me.passwordForm');
 Route::patch('/me/password', 'UserController@changePassword')->name('me.password');
 
- // mudar perfil 
-Route::patch('/me/profile', 'UserController@meProfile')->name('me.profile');
+//US10
+Route::get('/me/profile','UserController@showEditMyProfileForm')->name('me.profileForm');
+Route::put('/me/profile', 'UserController@updateMyProfile')->name('me.profile');
 
+//US11
 Route::get('/profiles', 'UserController@getProfile')->middleware('auth')->name('users.profiles');
-//US - 12
+
+//US12
 Route::get('/me/associates', 'UserController@getAssociates')->name('users.associates');
+
 Route::get('/me/associate-of','UserController@getAssociateOfMe')->name('me.associateOf');
 Route::get('/accounts/{user}','AccountController@showAccount')->name('account');
 Route::get('/accounts/{user}/opened','AccountController@showOpenAccount')->name('openedAcounts');

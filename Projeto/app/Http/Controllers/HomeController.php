@@ -23,7 +23,7 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $pagetitle="Meu Perfil";
+        $pagetitle="My Profile";
         return view('home',compact('pagetitle'));
     }
 }

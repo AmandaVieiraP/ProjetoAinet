@@ -18,7 +18,7 @@ class Controller extends BaseController
         $users = User::all();
         $movements = Movement::all();
         $accounts = Account::all();
-        $pagetitle = "Página inicial";
+        $pagetitle = "Home Page";
         return view('initialPage', compact('users', 'movements', 'accounts', 'pagetitle'));
     }
 }

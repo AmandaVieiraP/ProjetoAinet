@@ -85,4 +85,9 @@ class RegisterController extends Controller
             'profile_photo' => $nome,
         ]);        
     }
+
+    protected function showRegistrationForm(){
+        $pagetitle="Register";
+        return view('auth.register',compact('pagetitle'));
+    }
 }

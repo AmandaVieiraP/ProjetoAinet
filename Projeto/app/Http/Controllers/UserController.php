@@ -8,9 +8,16 @@ use Illuminate\Support\Facades\RedirectResponse;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 use App\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
+use Illuminate\Http\UploadedFile;
+use Validator;
 
 class UserController extends Controller
 {
+    public function __construct(){
+        $this->middleware('auth');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -87,6 +94,7 @@ class UserController extends Controller
         //
     }
 
+     //US5 e US6--------------------------------------------------------
     public function listAllUsersToAdmin(Request $request) {
 
         $pagetitle = "List of Users";
@@ -98,7 +106,7 @@ class UserController extends Controller
 
     private static function filter(Request $request){
         //se nada estiver prenchido
-        if(!$request->filled(['name','type','status'])){
+        if(!$request->filled('name') && !$request->filled('type') && !$request->filled('status')){
            return User::all(); 
         }
 
@@ -109,27 +117,27 @@ class UserController extends Controller
         }
 
         //só type normal
-        if(!$request->filled(['name','status'])&& $request->filled('type') && $request->query('type')=='normal'){
+        if(!$request->filled('name')&& $request->filled('type') && $request->query('type')=='normal' && !$request->filled('status')){
             return User::where('admin','=',false)->get();
         }
         //só type admin
-        if(!$request->filled(['name','status'])&& $request->filled('type') && $request->query('type')=='admin'){
+        if(!$request->filled('name')&& $request->filled('type') && $request->query('type')=='admin' && !$request->filled('status')){
 
             return User::where('admin','=',true)->get();
         }
 
         //só status blocked
-        if(!$request->filled(['name','type']) && $request->filled('status') && $request->query('status')=='blocked'){
+        if(!$request->filled('name')&& !$request->filled('type') && $request->filled('status') && $request->query('status')=='blocked'){
             return User::where('blocked','=',true)->get();
         }
 
         //só status unblocked
-        if(!$request->filled(['name','type']) && $request->filled('status') && $request->query('status')=='unblocked'){
+        if(!$request->filled('name')&& !$request->filled('type') && $request->filled('status') && $request->query('status')=='unblocked'){
             return User::where('blocked','=',false)->get();
         }
 
         //type+status
-        if(!$request->filled('name')&& $request->filled(['type','status']) && $request->query('type')=='normal'){
+        if(!$request->filled('name')&& $request->filled('type') && $request->query('type')=='normal' && $request->filled('status')){
             //'normal'+'blocked'
             if($request->query('status')=='blocked'){
                 return User::where('admin','=',false)->where('blocked','=',true)->get();
@@ -140,7 +148,7 @@ class UserController extends Controller
             }
         }
 
-        if(!$request->filled('name')&& $request->filled(['type','status']) && $request->query('type')=='admin'){
+        if(!$request->filled('name')&& $request->filled('type') && $request->query('type')=='admin' && $request->filled('status')){
             //'admin'+'blocked'
             if($request->query('status')=='blocked'){
                 return User::where('admin','=',true)->where('blocked','=',true)->get();
@@ -152,12 +160,12 @@ class UserController extends Controller
         }
 
         //só nome
-        if($request->filled(['name','status']) && !$request->filled('type')){
+        if($request->filled('name') && !$request->filled('type') && !$request->filled('status')){
             return User::where('name','like','%'.$request->query('name').'%')->get();
         }
 
         //nome+type
-        if($request->filled(['name','type']) && !$request->filled('status')){
+        if($request->filled('name') && $request->filled('type') && !$request->filled('status')){
             //'normal'
             if($request->query('type')=='normal'){
                 return User::where('name','like','%'.$request->query('name').'%')->where('admin','=',false)->get();
@@ -168,7 +176,7 @@ class UserController extends Controller
             }
         }
         //nome+status
-        if($request->filled(['name','status']) && !$request->filled('type')){
+        if($request->filled('name') && !$request->filled('type') && $request->filled('status')){
             //blocked
             if($request->query('status')=='blocked'){
                 return User::where('name','like','%'.$request->query('name').'%')->where('blocked','=',true)->get();
@@ -179,7 +187,7 @@ class UserController extends Controller
             }
         }
          //nome+type+status
-        if($request->filled(['name','type','status'])){
+        if($request->filled('name') && $request->filled('type') && $request->filled('status')){
             //'nome'+'normal'+'blocked'
             if($request->query('type')=='normal'){
                 if($request->query('status')=='blocked'){
@@ -203,6 +211,8 @@ class UserController extends Controller
             }
         }
     }
+    //------------------------------------------------------------------------
+
 
 
 
@@ -267,6 +277,95 @@ class UserController extends Controller
         $userToDemote->admin = 0;
         $userToDemote->save();
         return redirect()->route('list.of.all.users')->with('successMsg', "User was demoted succesfully"); 
+    }
+
+     public function showChangePasswordForm(){
+        $pagetitle = "Change My Password";
+        return view('users.changePassword', compact('pagetitle'));
+    }
+
+    public function changePassword(Request $request){
+        if ($request->has('cancel')) {
+            return redirect()->route('home');
+        }
+
+        //validação:
+        //require-> campo tem de estar preenchido
+        //confirmed-> existe um campo que há pelo menos outro campo igual no questionario e que é diferente de old_passwod
+         
+         // A password change fails with invalid old password
+         // 
+        $validatedData=$request->validate([
+            'old_password'=>'required',
+            'password'=>'required|confirmed|min:3|different:old_password',
+            'password_confirmation'=>'required|same:password',
+        ], [ 
+        'old_password.required' => 'You must enter your current password',
+        'password.required' => 'You must enter a new password',
+        'password.different' => 'The new password must be different from the current password',
+        'password.min' => 'The new password must have at least 3 characters',
+        'password_confirmation.required' => 'You must enter the confirmation password',
+        'password_confirmation.same' => 'The confirmation password must be equal to new password',
+        ]);
+
+        //false->old diferente da pass entao envia erro
+        if (!(Hash::check($request->input('old_password'), Auth::user()->password))) {
+            return redirect()->route('me.password')->withErrors(['old_password' => 'Please enter the correct current password']);
+        }
+            
+        $user_id=Auth::user()->id;
+        $user=User::findOrFail($user_id);
+        $user->password=Hash::make($request->input('password'));
+        $user->save();
+
+
+        return redirect()->route('home')->with('success', 'Your password has been updated');
+        
+    }
+
+    public function showEditMyProfileForm(){
+        $pagetitle = "Update My Profile";
+        return view('users.editMyProfile', compact('pagetitle'));
+    }
+
+    public function updateMyProfile(Request $request){
+        if ($request->has('cancel')) {
+            return redirect()->route('home');
+        }
+
+        $validatedData=$request->validate([
+            'name'=>'required|regex:/(^[A-Za-z ]+$)+/',
+            'phone'=>'nullable|regex:/(^[0-9\+ ]+$)+/',
+            'email' => 'email|required|'.Rule::unique('users')->ignore(Auth::User()->id),
+            'profile_photo'=>'nullable|image|mimes:png,jpeg,jpg',
+        ], [ 
+        'name.required' => 'Name must not be empty',
+        'name.regex' => 'Name must only have letters and spaces',
+        'email.required' => 'The email must not be empty',
+        'email.unique' => 'The email has already in use',
+        'email.email' => 'Please introduce an email in correct format',
+        'phone.regex' => 'Please enter only numbers in phone, spaces and symbol + on the phone',
+        'profile_photo.mimes' =>'The profile photo must be a file png, jpg, jpeg.',
+        ]);
+
+        $user = $request->user();
+
+
+        $user->fill($validatedData);
+
+        if(!$request->has('phone')){
+            $user->phone=null;
+        }
+
+
+        if ($request->hasFile('profile_photo')) {
+            $path= Storage::putFile('public/profiles/', $request->file('profile_photo'));
+            $user->profile_photo=basename($path);
+        }
+
+        $user->update();
+
+        return redirect()->route('home')->with('success', 'Your update has been updated');
     }
 
     public function getProfile(Request $request) {
