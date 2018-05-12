@@ -2,10 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Response;
+use App\AccountType;
 
 class AccountController extends Controller
 {
+    public function __construct(){
+        $this->middleware('auth');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -81,18 +88,67 @@ class AccountController extends Controller
     {
         //
     }
-    public function showAccount(){
+    public function showAccounts($user){
+        $user = User::findOrFail($user);
+        if(Auth::user()->id != $user->id) {
+            $pagetitle = "Unauthorized";
+            return Response::make(view('errors.403', compact('pagetitle')), 403); 
+        }
+        $accounts = $user->accounts;
+        $accounts_type = AccountType::all();
+
+        $pagetitle = "User's accounts";
+        
+        return view('users.listUserAccounts', compact('accounts', 'accounts_type', 'user', 'pagetitle')); 
+    }
+
+    public function showOpenAccounts($user){
+        $user = User::findOrFail($user);
+        if(Auth::user()->id != $user->id) {
+            $pagetitle = "Unauthorized";
+            return Response::make(view('errors.403', compact('pagetitle')), 403); 
+        }
+        $allAccounts = $user->accounts;
+        $accounts_type = AccountType::all();
+
+        $accounts = array();
+        foreach ($allAccounts as $a) {
+            if(is_null($a->deleted_at)) {
+                $accounts[] = $a;
+            }
+        }
+
+        $pagetitle = "User's open accounts";
+
+        return view('users.listUserAccounts', compact('accounts', 'accounts_type', 'user', 'pagetitle')); 
 
     }
-    public function showOpenAccount($user){
+    public function showCloseAccounts($user){
+        $user = User::findOrFail($user);
+        if(Auth::user()->id != $user->id) {
+            $pagetitle = "Unauthorized";
+            return Response::make(view('errors.403', compact('pagetitle')), 403); 
+        }
 
-    }
-    public function showCloseAccount($user){
+        $allAccounts = $user->accounts;
+        $accounts_type = AccountType::all();
 
+        $accounts = array();
+        foreach ($allAccounts as $a) {
+            if(!is_null($a->deleted_at)) {
+                $accounts[] = $a;
+            }
+        }
+
+        $pagetitle = "User's closed accounts";
+
+        return view('users.listUserAccounts', compact('accounts', 'accounts_type', 'user', 'pagetitle')); 
     }
+
     public function updateClose($account){
 
     }
+
     public function updateReopen($account){
 
     }

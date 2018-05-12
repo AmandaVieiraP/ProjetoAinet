@@ -36,5 +36,9 @@ class User extends Authenticatable
         return $this->belongsToMany(User::class, 'associate_members', 'main_user_id', 'associated_user_id')->withPivot('created_at');
     }
 
+    public function accounts() {
+        return $this->hasMany('App\Account', 'owner_id');
+    }
+
     
 }

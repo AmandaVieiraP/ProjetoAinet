@@ -52,15 +52,15 @@ Route::get('/me/profile','UserController@showEditMyProfileForm')->name('me.profi
 Route::put('/me/profile', 'UserController@updateMyProfile')->name('me.profile');
 
 //US11
-Route::get('/profiles', 'UserController@getProfile')->middleware('auth')->name('users.profiles');
+Route::get('/profiles', 'UserController@getProfile')->name('users.profiles');
 
 //US12
 Route::get('/me/associates', 'UserController@getAssociates')->name('users.associates');
 
 Route::get('/me/associate-of','UserController@getAssociateOfMe')->name('me.associateOf');
-Route::get('/accounts/{user}','AccountController@showAccount')->name('account');
-Route::get('/accounts/{user}/opened','AccountController@showOpenAccount')->name('openedAcounts');
-Route::get('/accounts/{user}/closed','AccountController@showCloseAccount')->name('account.closed');
+Route::get('/accounts/{user}','AccountController@showAccounts')->name('account');
+Route::get('/accounts/{user}/opened','AccountController@showOpenAccounts')->name('openedAcounts');
+Route::get('/accounts/{user}/closed','AccountController@showCloseAccounts')->name('account.closed');
 Route::delete('/account/{account}', 'AccountController@destroy')->name('account.delete');
 Route::patch('/account/{account}/close','AccountController@updateClose')->name('account.close');
 Route::patch('/account/{account}/reopen','AccountController@updateReopen')->name('account.reopen');
