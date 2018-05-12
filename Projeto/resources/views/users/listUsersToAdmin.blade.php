@@ -13,7 +13,7 @@
 @endif
 
 
-<div class="container-fluid bg-secondary text-light">
+<div class="container-fluid" id='bg-light-grey'>
     <h4>Filter User</h4>
     <form action="{{ route('list.of.all.users') }}" method="get" class="form-inline">
         <div class="form-group">
@@ -36,8 +36,9 @@
                 <option value="unblocked">Not Blocked</option>
             </select>
         </div>
-        <button type="submit" class="btn btn-light">Apply Filter</button>
+        <button type="submit" class="btn btn-secondary">Apply Filter</button>
     </form>
+</br>
 </div>
 @if (count($users))
     <table class="table table-striped">
