@@ -12,7 +12,6 @@
         @endalert
 @endif
 
-
 <div class="container-fluid" id='bg-light-grey'>
     <h4>Filter User</h4>
     <form action="{{ route('list.of.all.users') }}" method="get" class="form-inline">
