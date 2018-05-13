@@ -6,7 +6,10 @@ use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use App\AccountType;
+use App\Account;
+
 
 class AccountController extends Controller
 {
@@ -86,15 +89,33 @@ class AccountController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $account = Account::findOrFail($id);
+        $movements = $account->movements;
+        $user = $account->user;
+
+        if(Auth::user()->id != $user->id) {
+            $pagetitle = "Unauthorized";
+            return Response::make(view('errors.403', compact('pagetitle')), 403); 
+        } 
+
+        if (is_null($account->last_movement_date) || $movements->isEmpty()) {
+            $account->forceDelete();
+            return redirect()->route('accounts', $user->id)->with('successMsg', "Account was deleted succesfully");  
+        } 
+    
+        //soft delete
+        $account->delete();
+        return redirect()->route('accounts', $user->id)->with('warningMsg', "Account couldn't be deleted succesfully because it at movements so it was closed");  
     }
+
+
     public function showAccounts($user){
         $user = User::findOrFail($user);
         if(Auth::user()->id != $user->id) {
             $pagetitle = "Unauthorized";
             return Response::make(view('errors.403', compact('pagetitle')), 403); 
         }
-        $accounts = $user->accounts;
+        $accounts = $user->allAccounts;
         $accounts_type = AccountType::all();
 
         $pagetitle = "User's accounts";
@@ -108,15 +129,15 @@ class AccountController extends Controller
             $pagetitle = "Unauthorized";
             return Response::make(view('errors.403', compact('pagetitle')), 403); 
         }
-        $allAccounts = $user->accounts;
+        $allAccounts = $user->allAccounts;
         $accounts_type = AccountType::all();
 
-        $accounts = array();
-        foreach ($allAccounts as $a) {
-            if(is_null($a->deleted_at)) {
+          $accounts = array();
+       foreach ($allAccounts as $a) {
+            if(!$a->trashed()) {
                 $accounts[] = $a;
-            }
-        }
+            } 
+        }  
 
         $pagetitle = "User's open accounts";
 
@@ -130,15 +151,9 @@ class AccountController extends Controller
             return Response::make(view('errors.403', compact('pagetitle')), 403); 
         }
 
-        $allAccounts = $user->accounts;
         $accounts_type = AccountType::all();
 
-        $accounts = array();
-        foreach ($allAccounts as $a) {
-            if(!is_null($a->deleted_at)) {
-                $accounts[] = $a;
-            }
-        }
+        $accounts = $user->closedAccounts;
 
         $pagetitle = "User's closed accounts";
 
@@ -146,7 +161,15 @@ class AccountController extends Controller
     }
 
     public function updateClose($account){
-
+        $account = Account::findOrFail($account);
+        $user = $account->user;
+        if(Auth::user()->id != $user->id) {
+            $pagetitle = "Unauthorized";
+            return Response::make(view('errors.403', compact('pagetitle')), 403); 
+        }
+        //soft delete
+        $account->delete();
+        return redirect()->route('accounts', $user->id)->with('successMsg', "Account was closed succesfully");
     }
 
     public function updateReopen($account){

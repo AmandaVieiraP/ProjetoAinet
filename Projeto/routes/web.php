@@ -58,10 +58,11 @@ Route::get('/profiles', 'UserController@getProfile')->name('users.profiles');
 Route::get('/me/associates', 'UserController@getAssociates')->name('users.associates');
 
 Route::get('/me/associate-of','UserController@getAssociateOfMe')->name('me.associateOf');
-Route::get('/accounts/{user}','AccountController@showAccounts')->name('account');
-Route::get('/accounts/{user}/opened','AccountController@showOpenAccounts')->name('openedAcounts');
-Route::get('/accounts/{user}/closed','AccountController@showCloseAccounts')->name('account.closed');
+Route::get('/accounts/{user}','AccountController@showAccounts')->name('accounts');
+Route::get('/accounts/{user}/opened','AccountController@showOpenAccounts')->name('accounts.opened');
+Route::get('/accounts/{user}/closed','AccountController@showCloseAccounts')->name('accounts.closed');
 Route::delete('/account/{account}', 'AccountController@destroy')->name('account.delete');
+Route::get('/account/{account}/close','AccountController@updateClose')->name('account.close');
 Route::patch('/account/{account}/close','AccountController@updateClose')->name('account.close');
 Route::patch('/account/{account}/reopen','AccountController@updateReopen')->name('account.reopen');
 Route::post('/account','AccountController@store')->name('accounts.store');

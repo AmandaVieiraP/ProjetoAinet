@@ -59,6 +59,9 @@
                                     <a class="dropdown-item" href="{{ route('home') }}">
                                         My Profile
                                     </a>
+                                    <a class="dropdown-item" href="{{ action('AccountController@showAccounts', Auth::user()->id) }}">
+                                        My Accounts
+                                    </a>
                                     <!--Acrescentar novas opcoes de menu aqui-->
                                     <a class="dropdown-item" href="{{ route('me.passwordForm') }}">
                                         Change My Password

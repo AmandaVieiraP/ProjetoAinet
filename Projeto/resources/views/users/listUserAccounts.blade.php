@@ -1,6 +1,18 @@
 @extends('master')
 @section('content')
 
+
+@if(Session::has('warningMsg'))
+    @alert(['type' => 'warning','title'=>'Warning!'])
+        {{session('warningMsg')}}
+    @endalert
+
+    @elseif(Session::has('successMsg'))
+        @alert(['type' => 'success','title'=>'Success!'])
+            {{session('successMsg')}}
+        @endalert
+@endif
+
 <div class='float-left' id='espaco'>
 	<h4> <b>User: </b> {{ $user->name }} </h4>
 </div>
@@ -19,6 +31,7 @@
                 <th>Date</th>
                 <th>Current balance</th>
                 <th>Status</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -40,6 +53,20 @@
                 	 @else 
                 	    <span> Closed </span>
                 	 @endif
+                </td>
+                <td>   
+                    <form action="{{ action('AccountController@updateClose', $account->id) }}" method="POST" role="form" class="btn-block">
+                        @csrf
+                        @method('patch')
+                        <input type="hidden" name="id" value="{{ $account->id }} ?>">
+                        <button type="submit" class="btn btn-xs btn-secondary btn-block">Close</button>
+                    </form> 
+                    <form action="{{ action('AccountController@destroy', $account->id) }}" method="POST" role="form" class="btn-block">
+                        @csrf
+                        @method('delete')
+                        <input type="hidden" name="id" value="{{ $account->id }} ?>">
+                        <button type="submit" class="btn btn-xs btn-secondary btn-block">Delete</button>
+                    </form>
                 </td>
             </tr>
         @endforeach
