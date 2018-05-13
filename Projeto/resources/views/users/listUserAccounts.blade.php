@@ -54,19 +54,31 @@
                 	    <span> Closed </span>
                 	 @endif
                 </td>
-                <td>   
+                <td> 
+                  
+                    @if(is_null($account->deleted_at))
                     <form action="{{ action('AccountController@updateClose', $account->id) }}" method="POST" role="form" class="btn-block">
                         @csrf
                         @method('patch')
                         <input type="hidden" name="id" value="{{ $account->id }} ?>">
                         <button type="submit" class="btn btn-xs btn-secondary btn-block">Close</button>
-                    </form> 
+                    </form>
+                    @else
+                    <form action="{{ action('AccountController@updateReopen', $account->id) }}" method="POST" role="form" class="btn-block">
+                        @csrf
+                        @method('patch')
+                        <input type="hidden" name="id" value="{{ $account->id }} ?>">
+                        <button type="submit" class="btn btn-xs btn-secondary btn-block">Reopen</button>
+                    </form>
+                    @endif
+
                     <form action="{{ action('AccountController@destroy', $account->id) }}" method="POST" role="form" class="btn-block">
                         @csrf
                         @method('delete')
                         <input type="hidden" name="id" value="{{ $account->id }} ?>">
                         <button type="submit" class="btn btn-xs btn-secondary btn-block">Delete</button>
                     </form>
+
                 </td>
             </tr>
         @endforeach

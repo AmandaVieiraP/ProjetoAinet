@@ -173,6 +173,21 @@ class AccountController extends Controller
     }
 
     public function updateReopen($account){
+        
+        $account = Account::withTrashed()->findOrFail($account);
+        
+        $user = $account->user;
+
+        if(Auth::user()->id != $user->id) {
+            $pagetitle = "Unauthorized";
+            return Response::make(view('errors.403', compact('pagetitle')), 403); 
+        }
+
+        if($account->trashed()){
+            $account->restore();
+        }
+
+        return redirect()->route('accounts', $user->id)->with('successMsg', "Account was open succesfully");
 
     }
 }
