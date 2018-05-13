@@ -9,12 +9,23 @@
     @endalert
     @endif
 
-    @if (auth()->user()->profile_photo)
-        <img src="{{ asset('storage/profiles/' . auth()->user()->profile_photo) }}" class="img-fluid img-thumbnail float-left" alt="Foto Perfil" width="200" height="200">
-    @else
-        <img src="{{ asset('storage/profiles/avatar.jpg') }}" alt="Foto Perfil" width="200" height="200">
-    @endif
-    <h5>&nbsp;Name: &nbsp;{{ Auth::user()->name }}</h5>
-
+    <div class="card text-center">
+      <div class="card-header">
+        <span>&nbsp;Member since &nbsp;{{ Auth::user()->created_at->format('F Y') }}</span>
+      </div>
+      <div class="card-body">
+        <h5 class="card-title">&nbsp;Name: &nbsp;{{ Auth::user()->name }}</h5>
+        @if (auth()->user()->profile_photo)
+            <img src="{{ asset('storage/profiles/' . auth()->user()->profile_photo) }}" class="img-thumbnail" alt="Foto Perfil" width="150" height="170">
+        @else
+            <img src="{{ asset('storage/profiles/avatar.jpg') }}" class="img-thumbnail" alt="Foto Perfil" width="150" height="150">
+        @endif
+        <p class="card-text">&nbsp;E-mail: &nbsp;{{ Auth::user()->email }}</p>
+        
+      </div>
+      <div class="card-footer text-muted">
+        <p class="font-weight-light">&nbsp;Last updated &nbsp;{{ Auth::user()->updated_at->diffForHumans() }}</p>
+      </div>
+    </div>
 </div>
 @endsection
