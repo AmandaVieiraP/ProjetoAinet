@@ -98,7 +98,7 @@ class AccountController extends Controller
             return Response::make(view('errors.403', compact('pagetitle')), 403); 
         } 
 
-        if (is_null($account->last_movement_date) || $movements->isEmpty()) {
+        if (is_null($account->last_movement_date) && $movements->isEmpty()) {
             $account->forceDelete();
             return redirect()->route('accounts', $user->id)->with('successMsg', "Account was deleted succesfully");  
         } 
