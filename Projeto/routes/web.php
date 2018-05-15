@@ -11,7 +11,7 @@
 |
 */
 
-//US1
+//US1 
 Route::get('/', 'Controller@initialPage')->name('initial.page');
 
 //US2, US3, US4

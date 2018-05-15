@@ -17,9 +17,13 @@
         <tr>
         	<td>
         		@if (auth()->user()->profile_photo)
-        			<img src="{{ asset('storage/profiles/' . $user->profile_photo) }}" class="img-fluid img-thumbnail float-left" alt="Foto Perfil">
+                    <div class="float-left">
+        			     <img src="{{ asset('storage/profiles/' . $user->profile_photo) }}" alt="Foto Perfil" width="50" height="60">
+                    </div>
 			    @else
-			        <img src="{{ asset('storage/profiles/avatar.jpg') }}" alt="Foto Perfil">
+                    <div class="float-left">
+			             <img src="{{ asset('storage/profiles/avatar.jpg') }}" alt="Foto Perfil" width="50" height="60">
+                    </div>
 			    @endif
         	</td>
             <td>{{ $user->name }}</td>
@@ -30,7 +34,7 @@
     </table>
 
 @else 
-    <h2>No users found</h2>
+    <h2>No users found</h2> 
 
 @endif
 @endsection('content')

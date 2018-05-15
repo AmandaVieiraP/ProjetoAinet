@@ -21,6 +21,10 @@ class Account extends Model
         return $this->hasMany('App\Movement');
     }
 
+    public function movementsOrderByDateDesc() {
+        return $this->hasMany('App\Movement')->orderBy('date');
+    }
+
     /* public function getUpdatedAtColumn() {
         return null;
     } */

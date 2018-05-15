@@ -2,37 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Response;
-use App\Account;
 use App\MovementCategories;
+use Illuminate\Http\Request;
 
-class MovementController extends Controller
+class MovementCategoriesController extends Controller
 {
-
-    public function __construct(){
-        $this->middleware('auth');
-    }
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($id)  // account id
+    public function index()
     {
-        $account = Account::findOrFail($id);
-        $accountOwner = $account->user;
-        if (Auth::user()->id != $accountOwner->id) {
-            $pagetitle = "Unauthorized";
-            return Response::make(view('errors.403', compact('pagetitle')), 403);
-        }
-
-        $movements = $account->movements->sortByDesc('date');
-        $movementCategories = MovementCategories::all();
-
-        $pagetitle = "Movements";
-        return view('users.listMovementsOfAccount', compact('movements', 'movementCategories', 'account', 'pagetitle'));
+        //
     }
 
     /**
@@ -59,10 +41,10 @@ class MovementController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\MovementCategories  $movementCategories
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(MovementCategories $movementCategories)
     {
         //
     }
@@ -70,10 +52,10 @@ class MovementController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\MovementCategories  $movementCategories
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(MovementCategories $movementCategories)
     {
         //
     }
@@ -82,10 +64,10 @@ class MovementController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \App\MovementCategories  $movementCategories
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, MovementCategories $movementCategories)
     {
         //
     }
@@ -93,10 +75,10 @@ class MovementController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  \App\MovementCategories  $movementCategories
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(MovementCategories $movementCategories)
     {
         //
     }

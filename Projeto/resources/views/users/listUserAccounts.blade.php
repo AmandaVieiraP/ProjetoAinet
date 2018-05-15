@@ -78,7 +78,7 @@
                         <input type="hidden" name="id" value="{{ $account->id }} ?>">
                         <button type="submit" class="btn btn-xs btn-secondary btn-block">Delete</button>
                     </form>
-
+                    <a class="btn btn-xs btn-secondary btn-block" href="{{ action('MovementController@index', $account->id) }}">Movements</a>   
                 </td>
             </tr>
         @endforeach
