@@ -388,10 +388,10 @@ class UserController extends Controller
 
     }
 
-    public function getAssociates() {
-        //As a user I want to view the list of users that belong to my group of associate members.
-        
-        //The list should show at least the name and email of the member;
+    public function getAssociates(){
+        $pagetitle = "List of Associated users";
+        $users = Auth::user()->associateds; 
+        return view('users.listofAssociateMembers', compact('users', 'pagetitle'));
     }
 
     public function getAssociateOfMe(){
