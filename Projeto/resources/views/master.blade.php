@@ -59,7 +59,7 @@
                                     <a class="dropdown-item" href="{{ route('home') }}">
                                         My Profile
                                     </a>
-                                    <a class="dropdown-item" href="{{ action('AccountController@showAccounts', Auth::user()->id) }}">
+                                    <a class="dropdown-item" href="{{ route('my.accounts', Auth::id()) }}">
                                         My Accounts
                                     </a>
                                     <!--Acrescentar novas opcoes de menu aqui-->

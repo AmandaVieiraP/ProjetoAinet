@@ -29,6 +29,10 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('admin', function ($user) {
             return $user->admin == true;
         });
+         //user so pode editar contas que lhe pertençam
+        Gate::define('edit-account', function ($user, $account_id) {
+           return $user->isOwner($account_id);
+        });
 
         //
     }

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\AccountType;
 use App\Account;
 use Carbon\Carbon;
+use Illuminate\Validation\Rule;
 
 class AccountController extends Controller
 {
@@ -65,9 +66,54 @@ class AccountController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+   public function showAccForm($id)
+    {
+        $types= AccountType::all();
+        $account = Account::findOrFail($id);
+        $pagetitle = "Update Account";
+        if (Auth::user()->can('edit-account', $id)) {
+            return view('accounts.editAccount', compact('types','account','pagetitle'));    
+        }else{
+            $pagetitle = "Unauthorized";
+            return Response::make(view('errors.403', compact('pagetitle')), 403);
+        }
+        
+    }
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function update(Request $request, $id)
     {
-        //
+        if ($request->has('cancel')) {
+            return redirect()->route('home');
+        }
+        $account = Account::findOrFail($id);
+        if (!Auth::user()->can('edit-account', $id)) {
+            $pagetitle = "Unauthorized";
+            return Response::make(view('errors.403', compact('pagetitle')), 403);
+        }
+
+        $validatedData=$request->validate([
+            'code'=> ['required', Rule::unique('accounts')->where(function ($query){
+               return $query->where('owner_id', Auth::id());
+            })],
+            'account_type_id'=>['required', 'exists:account_types,id',Rule::unique('accounts')->where(function ($query){
+               return $query->where('owner_id', Auth::id());
+            })],
+            'start_balance' => 'required|numeric|min:0',
+            'description'=>'nullable|string',
+            'date'=>'required|date',
+        ], [ 
+            //custom msgs        
+        ]);
+
+        $account->fill($validatedData);
+        $account->update();
+        return redirect()->route('home')->with('success', 'Your account has been updated');
     }
 
     /**
@@ -97,10 +143,22 @@ class AccountController extends Controller
         return redirect()->route('accounts', $user->id)->with('warningMsg', "Account couldn't be deleted succesfully because it at movements so it was closed");  
     }
 
-    public function showAccounts($user)
+    private function verifyAssociateds($user)
     {
+        $associateds = Auth::user()->associated_of;
+        foreach ($associateds as $associated) 
+        {
+            if($associated->id == $user->id){
+              return true;
+            }
+        }
+        return false;
+    }
+
+    public function showAccounts($user){
         $user = User::findOrFail($user);
-        if(Auth::user()->id != $user->id) {
+        
+        if(Auth::user()->id != $user->id && !$this->verifyAssociateds($user)) {
             $pagetitle = "Unauthorized";
             return Response::make(view('errors.403', compact('pagetitle')), 403); 
         }

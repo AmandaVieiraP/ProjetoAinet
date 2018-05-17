@@ -51,6 +51,10 @@ Route::get('/profiles', 'UserController@getProfile')->name('users.profiles');
 
 //US12
 Route::get('/me/associates', 'UserController@getAssociates')->name('users.associates');
+//ACRESCENTADO
+Route::get('/me/accounts',function(){
+	return redirect()->route('accounts.opened',Auth::id());
+})->name('my.accounts');
 //US13
 Route::get('/me/associate-of','UserController@getAssociateOfMe')->name('me.associateOf');
 //US14
@@ -66,8 +70,10 @@ Route::patch('/account/{account}/reopen','AccountController@updateReopen')->name
 //US17
 Route::get('/account','AccountController@showAddAccountForm');
 Route::post('/account','AccountController@store')->name('accounts.store');
+//------------ACRESCENTADO--------------
+Route::get('/account/{account}','AccountController@showAccForm')->name('accounts.editAccount');/*->middleware('can:edit-account,account_id');*/
 //US18
-Route::put('/account/{account}','AccountController@update')->name('accounts.editAccount');
+Route::put('/account/{account}','AccountController@update')->name('accounts.updateAccount');
 
 //US.20
 Route::get('/movements/{account}','MovementController@index')->name('movements.index');
