@@ -73,7 +73,7 @@ Route::post('/account','AccountController@store')->name('accounts.store');
 //------------ACRESCENTADO--------------
 Route::get('/account/{account}','AccountController@showAccForm')->name('accounts.editAccount');/*->middleware('can:edit-account,account_id');*/
 //US18
-Route::put('/account/{account}','AccountController@update')->name('accounts.updateAccount');
+Route::put('/account/{account}','AccountController@update')->name('accounts.editAccount');
 
 //US.20
 Route::get('/movements/{account}','MovementController@index')->name('movements.index');
@@ -91,7 +91,7 @@ Route::delete('/movements/{account}/{movement}','MovementController@destroy')->n
 Route::get('/documents/{movement}','DocumentController@showUploadForm')->name('getdocument.movement');
 Route::post('/documents/{movement}','DocumentController@update')->name('postdocument.movement');
 //US.24
-Route::delete('/documents/{movement}/{document}','DocumentController@destroy')->name('documents.destroy');
+Route::delete('/document/{document}','DocumentController@destroy')->name('documents.destroy');
 //US.25
 Route::get('/documents/{movement}/{document}','DocumentController@getDoc')->name('documents.getdoc');
 //US.26

@@ -12,10 +12,10 @@ class Account extends Model
     protected $fillable = [
          'owner_id', 'account_type_id', 'date','code','description','start_balance','current_balance',
     ];
-	//protected $dates = ['deleted_at'];
+    //protected $dates = ['deleted_at'];
 
     public $timestamps = false;
-	
+    
     public function user() {
         return $this->belongsTo('App\User', 'owner_id');
     }

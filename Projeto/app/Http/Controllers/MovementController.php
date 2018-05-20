@@ -32,7 +32,7 @@ class MovementController extends Controller
         $movementCategories = MovementCategories::all();
 
         $pagetitle = "Movements";
-        return view('users.listMovementsOfAccount', compact('movements', 'movementCategories', 'account', 'pagetitle'));
+        return view('movements.listMovementsOfAccount', compact('movements', 'movementCategories', 'account', 'pagetitle'));
     }
 
     /**

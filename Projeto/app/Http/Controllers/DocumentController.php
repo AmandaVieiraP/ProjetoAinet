@@ -111,31 +111,29 @@ class DocumentController extends Controller
 
         if($movement->document_id==null){
             $document=Document::create($documentArray);
+            $movement->document()->associate($document);
+            $movement->save();
         }
         else{
+
             $doc_id=$movement->document_id;
-            //procura o movimento
             $document=Document::findOrFail($doc_id);
 
-            $movement->document()->dissociate();
-            $movement->save();
-            Document::destroy($doc_id);
+            Storage::delete('documents/'.$account->id.'/'.$movement->id.'.'.$document->type);
 
-            $documentArray['id']=$doc_id;
-            $document->fill($documentArray);
-            $document->save();
-
-            //Document::create($documentArray);
+            Document::where('id',$doc_id)->update(
+                array(
+                 'type' => $documentArray['type'],
+                 'original_name' => $documentArray['original_name'],
+                 'description' => $documentArray['description'],
+              )
+            );
         }
         
         //armazenar o documento na Strorage
-        Storage::putFileAs('documents/'.$account->id.'/', $request->file('document_file'),$movement->id.'.'.$document->type);
-
-        //associar o documento ao movimento
-        $movement->document()->associate($document);
-        $movement->save();
+        Storage::putFileAs('documents/'.$account->id.'/', $request->file('document_file'),$movement->id.'.'.$documentArray['type']);
         
-        return redirect()->route('movements.index',['account' => $account->id]);
+        return redirect()->route('movements.index',['account' => $account->id])->with('successMsg','Your document has been uploaded');;
     }
 
     /**
@@ -146,7 +144,28 @@ class DocumentController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $document=Document::findOrFail($id);
+
+        $movement=Movement::where('document_id',$id)->first();
+
+        $account=Account::findOrFail($movement->account_id);
+
+        if (Auth::user()->id != $account->owner_id) {
+            $pagetitle = "Unauthorized";
+            return Response::make(view('errors.403', compact('pagetitle')), 403);
+        }
+
+        Movement::where('document_id',$id)->update(
+                array(
+                 'document_id'=>null,
+              )
+            );
+
+        $document->delete();
+
+        Storage::delete('documents/'.$movement->account_id.'/'.$movement->id.'.'.$document->type);
+
+        return redirect()->route('movements.index',['account' => $movement->account_id])->with('successMsg','Your document has been deleted');
     }
 
 
@@ -158,6 +177,6 @@ class DocumentController extends Controller
         $movement=Movement::findOrFail($id);
         $pagetitle="Upload Document";
 
-        return view('users.uploadDocument', compact('movement','pagetitle'));
+        return view('movements.documents.uploadDocument', compact('movement','pagetitle'));
     }
 }

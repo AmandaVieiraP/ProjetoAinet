@@ -34,6 +34,5 @@ class AuthServiceProvider extends ServiceProvider
            return $user->isOwner($account_id);
         });
 
-        //
     }
 }

@@ -386,8 +386,8 @@ class UserController extends Controller
         return view('users.listofAssociateMembers', compact('users', 'pagetitle'));
     }
 
-   public function getAssociateOfMe(){
-        $pagetitle = "title";
+    public function getAssociateOfMe(){
+        $pagetitle = "Users that I'm associated";
         $users = Auth::user()->associated_of;
         return view('users.listofAssociateMembersOf', compact('users', 'pagetitle'));        
 

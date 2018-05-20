@@ -66,7 +66,7 @@ class AccountController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-   public function showAccForm($id)
+    public function showAccForm($id)
     {
         $types= AccountType::all();
         $account = Account::findOrFail($id);
@@ -155,10 +155,10 @@ class AccountController extends Controller
         return false;
     }
 
-    public function showAccounts($user){
+    public function showAccounts($user)
+    {
         $user = User::findOrFail($user);
-        
-        if(Auth::user()->id != $user->id && !$this->verifyAssociateds($user)) {
+        if(Auth::user()->id != $user->id) {
             $pagetitle = "Unauthorized";
             return Response::make(view('errors.403', compact('pagetitle')), 403); 
         }
@@ -247,7 +247,7 @@ class AccountController extends Controller
         $pagetitle="Add New Account";
         $types = AccountType::all();
 
-        return view('users.addUserAccount', compact('pagetitle','types')); 
+        return view('accounts.addUserAccount', compact('pagetitle','types')); 
     }
 
         /**

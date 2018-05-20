@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Document extends Model
 {
     protected $fillable = [
-         'type', 'original_name', 'description',
+         'id','type', 'original_name', 'description',
     ];
 
     public $timestamps  = false;
