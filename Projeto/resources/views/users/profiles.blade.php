@@ -3,7 +3,7 @@
 
 <div class="container-fluid" id='bg-light-grey'>
     <h5> Search user by name </h5>
-    <form action="{{ route('users.profiles') }}" method="get" class="form-inline">
+    <form action="{{ route('profiles') }}" method="get" class="form-inline">
         <div class="form-group">
             <label for="inputName" class="mr-sm-2">Name</label>
             <input type="text" name="name" id="inputName" placeholder=" Enter name" class="form-control mb-2 mr-sm-2 mb-sm-0" value="{{ old('name') }}">

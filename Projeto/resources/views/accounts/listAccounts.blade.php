@@ -26,16 +26,16 @@
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav">
       <li>
-        <a class="nav-link" href="{{ action('AccountController@showAccounts', $user->id) }}">All Accounts</a>
+        <a class="nav-link" href="{{ route('accounts',['user'=>$user->id]) }}">All Accounts</a>
       </li>
       <li>
-        <a class="nav-link" href="{{ action('AccountController@showCloseAccounts', $user->id) }}">Only Closed Accounts</a>
+        <a class="nav-link" href="{{ route('accounts.closed',['user'=>$user->id]) }}">Only Closed Accounts</a>
       </li>
       <li>
-        <a class="nav-link" href="{{ action('AccountController@showOpenAccounts', $user->id) }}">Open Accounts</a>
+        <a class="nav-link" href="{{ route('accounts.opened',['user'=>$user->id]) }}">Open Accounts</a>
       </li>
       <li>
-        <a class="nav-link" href="{{ action('AccountController@showAddAccountForm') }}">Add New Account</a>
+        <a class="nav-link" href="{{ route('account.create') }}">Add New Account</a>
       </li>
     </ul>
   </div>
@@ -53,6 +53,7 @@
                 <th>Current balance</th>
                 <th>Status</th>
                 <th>Actions</th>
+                <th>Movements List</th>
             </tr>
         </thead>
         <tbody>
@@ -60,46 +61,45 @@
             <tr>
                 <td>{{ $account->code}}</td>
                 <td> 
-                	@foreach($accounts_type as $type) 
-                		@if ($account->account_type_id == $type->id)
-                			{{ $type->name }}
-                		@endif
-                	@endforeach
+                    @foreach($accounts_type as $type) 
+                        @if ($account->account_type_id == $type->id)
+                            {{ $type->name }}
+                        @endif
+                    @endforeach
                 </td>
                 <td>{{ $account->date }} </td>
                 <td>{{ $account->current_balance}} </td> 
                 <td> 
-                	 @if (is_null($account->deleted_at)) 
-                	 	<span> Open </span>
-                	 @else 
-                	    <span> Closed </span>
-                	 @endif
+                     @if (is_null($account->deleted_at)) 
+                        <span> Open </span>
+                     @else 
+                        <span> Closed </span>
+                     @endif
                 </td>
                 <td> 
                   
                     @if(is_null($account->deleted_at))
-                    <form action="{{ action('AccountController@updateClose', $account->id) }}" method="POST" role="form" class="btn-block">
+                    <form action="{{ route('account.close',['account'=>$account->id]) }}" method="POST" role="form" class="btn-block">
                         @csrf
                         @method('patch')
-                        <input type="hidden" name="id" value="{{ $account->id }} ?>">
                         <button type="submit" class="btn btn-xs btn-secondary btn-block">Close</button>
                     </form>
                     @else
-                    <form action="{{ action('AccountController@updateReopen', $account->id) }}" method="POST" role="form" class="btn-block">
+                    <form action="{{ route('account.reopen',['account'=>$account->id]) }}" method="POST" role="form" class="btn-block">
                         @csrf
                         @method('patch')
-                        <input type="hidden" name="id" value="{{ $account->id }} ?>">
                         <button type="submit" class="btn btn-xs btn-secondary btn-block">Reopen</button>
                     </form>
                     @endif
-
-                    <form action="{{ action('AccountController@destroy', $account->id) }}" method="POST" role="form" class="btn-block">
+                    <form action="{{ route('account.delete',['account'=>$account->id]) }}" method="POST" role="form" class="btn-block">
                         @csrf
                         @method('delete')
-                        <input type="hidden" name="id" value="{{ $account->id }} ?>">
                         <button type="submit" class="btn btn-xs btn-secondary btn-block">Delete</button>
-                    </form>
-                    <a class="btn btn-xs btn-secondary btn-block" href="{{ action('MovementController@index', $account->id) }}">Movements</a>   
+                    </form> 
+                    <a class="btn btn-xs btn-secondary btn-block" href="{{ route('account.edit',['account'=>$account->id]) }}">Edit</a>   
+                </td>
+                <td class="align-middle">
+                    <a class="btn btn-xs btn-secondary btn-block" href="{{ route('movements.index',['account'=>$account->id]) }}">Access</a> 
                 </td>
             </tr>
         @endforeach

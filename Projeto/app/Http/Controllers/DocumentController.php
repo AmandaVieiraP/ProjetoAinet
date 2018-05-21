@@ -32,9 +32,12 @@ class DocumentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create($id)
     {
-        //
+        $movement=Movement::findOrFail($id);
+        $pagetitle="Upload Document";
+
+        return view('movements.documents.uploadDocument', compact('movement','pagetitle'));
     }
 
     /**
@@ -171,12 +174,5 @@ class DocumentController extends Controller
 
     public function getDoc($id){
 
-    } 
-
-    public function showUploadForm($id){
-        $movement=Movement::findOrFail($id);
-        $pagetitle="Upload Document";
-
-        return view('movements.documents.uploadDocument', compact('movement','pagetitle'));
     }
 }

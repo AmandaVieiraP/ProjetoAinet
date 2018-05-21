@@ -59,18 +59,9 @@
                                     <a class="dropdown-item" href="{{ route('home') }}">
                                         My Profile
                                     </a>
-                                    <a class="dropdown-item" href="{{ route('my.accounts', Auth::id()) }}">
-                                        My Accounts
-                                    </a>
                                     <!--Acrescentar novas opcoes de menu aqui-->
-                                    <a class="dropdown-item" href="{{ route('me.passwordForm') }}">
-                                        Change My Password
-                                    </a>
-                                    <a class="dropdown-item" href="{{ route('me.profileForm') }}">
-                                        Update My Profile
-                                    </a>
                                     @can('admin')
-                                    <a class="dropdown-item" href="{{route('list.of.all.users') }}">
+                                    <a class="dropdown-item" href="{{route('admin.users') }}">
                                         Administration Options
                                     </a>
                                     @endcan

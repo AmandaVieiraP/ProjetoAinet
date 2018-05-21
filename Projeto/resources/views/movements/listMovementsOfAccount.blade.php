@@ -18,7 +18,7 @@
 @endif
 
 @if(count($movements))
-	<table class="table table-striped">
+    <table class="table table-striped">
         <thead>
             <tr>
                 <th>Category</th>
@@ -33,18 +33,18 @@
         @foreach ($movements as $movement)    
             <tr>
                 <td>
-                	@foreach($movementCategories as $category)
-                		@if ($movement->movement_category_id == $category->id)
-                			{{ $category->name }}
-                		@endif
-                	@endforeach
+                    @foreach($movementCategories as $category)
+                        @if ($movement->movement_category_id == $category->id)
+                            {{ $category->name }}
+                        @endif
+                    @endforeach
                 </td>
                 <td>{{ $movement->date }}</td>
                 <td> {{ $movement->value }} </td>
                 <td> {{ $movement->type }} </td> 
                 <td> {{ $movement->end_balance }} </td>
                 <td>
-                    <a href="{{ route('getdocument.movement',['movement' => $movement->id]) }}"class="btn btn-xs btn-secondary btn-block">Upload</a>
+                    <a href="{{ route('documents.create',['movement' => $movement->id]) }}"class="btn btn-xs btn-secondary btn-block">Upload</a>
 
                     @if (!is_null($movement->document_id))
                     

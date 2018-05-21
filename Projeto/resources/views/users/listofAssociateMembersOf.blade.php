@@ -16,19 +16,19 @@
     <tbody>
     @foreach ($users as $user)    
         <tr>
-        	<td>
-        		<div class="float-left"> 
+            <td>
+                <div class="float-left"> 
                     @if (auth()->user()->profile_photo)
                         <div class="float_left">
                             <img src="{{ asset('storage/profiles/' . $user->profile_photo) }}" width="50" height="60" alt="Foto Perfil">
-    			        </div>
+                        </div>
                     @else 
                          <div class="float_left">
                         <img src="{{ asset('storage/profiles/avatar.jpg') }}" width="50" height="60" alt="Foto Perfil">
                         </div>
                     @endif
                 </div>
-        	</td>
+            </td>
             <td>{{ $user->name }}</td>
             <td>{{ $user->email }}</td>
             <td>{{ $user->phone }}</td>
