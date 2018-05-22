@@ -153,9 +153,16 @@ Route::group(
         //US23
         Route::get('{movement}','DocumentController@create')->name('documents.create');
         Route::post('{movement}','DocumentController@update')->name('documents.update');
+    }
+);
+
+Route::group(
+    ['prefix'=>'document',
+    ],
+    function(){
         //US.24
-        Route::delete('{document}','DocumentController@destroy')->name('documents.destroy');
+        Route::delete('{document}','DocumentController@destroy')->name('document.destroy');
         //US.25
-        Route::get('{movement}/{document}','DocumentController@getDoc')->name('documents.getdoc');
+        Route::get('{document}','DocumentController@show')->name('document.show');
     }
 );

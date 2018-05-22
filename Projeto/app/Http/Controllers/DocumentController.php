@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Response;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use App\Document;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\File;
 
 class DocumentController extends Controller
 {
@@ -59,7 +61,16 @@ class DocumentController extends Controller
      */
     public function show($id)
     {
-        //
+        $document=Document::findOrFail($id);
+
+        $movement=Movement::where('document_id',$id)->first();
+
+        if(Gate::forUser(Auth::user())->denies('download-document',$id)){
+            $pagetitle = "Unauthorized";
+            return Response::make(view('errors.403', compact('pagetitle')), 403); 
+        }
+
+        return Storage::download('documents/'.$movement->account_id.'/'.$movement->id.'.'.$document->type, $document->original_name,[]);
     }
 
     /**
@@ -169,10 +180,5 @@ class DocumentController extends Controller
         Storage::delete('documents/'.$movement->account_id.'/'.$movement->id.'.'.$document->type);
 
         return redirect()->route('movements.index',['account' => $movement->account_id])->with('successMsg','Your document has been deleted');
-    }
-
-
-    public function getDoc($id){
-
     }
 }

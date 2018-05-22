@@ -20,13 +20,13 @@
 @if(count($movements))
     <table class="table table-striped">
         <thead>
-            <tr>
+            <tr class="text-center">
                 <th>Category</th>
                 <th>Date</th>
                 <th>Value</th>
                 <th>Type</th>
                 <th>End Balance</th>
-                <th>Document</th>
+                <th colspan="3">Document</th>
             </tr>
         </thead>
         <tbody>
@@ -44,18 +44,23 @@
                 <td> {{ $movement->type }} </td> 
                 <td> {{ $movement->end_balance }} </td>
                 <td>
-                    <a href="{{ route('documents.create',['movement' => $movement->id]) }}"class="btn btn-xs btn-secondary btn-block">Upload</a>
-
-                    @if (!is_null($movement->document_id))
-                    
-                    <form action="{{ route('documents.destroy',['document'=>$movement->document_id]) }}" method="POST">
+                    <a href="{{ route('documents.create',['movement' => $movement->id]) }}" class="btn btn-secondary btn-xs">Upload</a>
+                </td>
+                @if (!is_null($movement->document_id))
+                <td>
+                    <a href="{{ route('document.show',['document'=>$movement->document_id])}}"  class="btn btn-secondary btn-xs">Download</a>
+                </td>
+                <td>
+                    <form action="{{ route('document.destroy',['document'=>$movement->document_id]) }}" method="POST">
                         @method('delete')
                         @csrf
-                        <button type="submit" class="btn btn-xs btn-secondary btn-block"> Delete Document</button>
+                        <button type="submit" class="btn btn-secondary btn-xs">Delete</button>
                     </form>
-
-                    @endif
-                 </td>
+                </td>
+                @else
+                <td></td>
+                <td></td>
+                @endif
             </tr>
         @endforeach
     </table>
