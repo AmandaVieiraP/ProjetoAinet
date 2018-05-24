@@ -68,6 +68,8 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+
+
         if(isset($data['profile_photo'])){
            $imagem= $data['profile_photo'];
            $nome = basename($imagem->store('profiles', 'public'));

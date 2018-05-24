@@ -49,15 +49,5 @@ class User extends Authenticatable
         return $this->hasMany('App\Movement');
     }
 
-    public function isOwner($account_id)
-    {
-        $useraccounts = $this->allAccounts;
-          foreach ($useraccounts as $acc) {
-              if($acc->id == $account_id){
-                return true;
-              }
-          }
-         
-            return false;
-    }
+    
 }

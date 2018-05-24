@@ -16,153 +16,78 @@ Route::get('/', 'Controller@initialPage')->name('initial.page');
 
 //US2, US3, US4
 Auth::routes();
+//Override da rota Login, Register, Home para mudar a aparência do form
 Route::get('login','Auth\LoginController@showLoginForm')->name('login');
+
 Route::get('register', 'Auth\RegisterController@showRegistrationForm')->name('register');
+
 Route::get('/home', 'HomeController@index')->name('home');
 
+//US5, US6
+//Route::get('/users', 'UserController@listAllUsersToAdmin')->middleware('can:admin')->name('list.of.all.users');
+Route::get('/users', 'UserController@listAllUsersToAdmin')->middleware('admin')->name('list.of.all.users');
 
-Route::group(
-    ['middleware'=>'admin',
-     'prefix'=>'users',
-    ],
-    function(){
-        //US5, US6
-        Route::get('/','UserController@listAllUsersToAdmin')->name('admin.users');
-        //US7
-        Route::patch('{user}/block', 'UserController@blockUser')->name('admin.users.block');
-        Route::patch('{user}/unblock', 'UserController@unblockUser')->name('admin.users.unblock');
-        Route::patch('{user}/promote', 'UserController@promoteUser')->name('admin.users.promote');
-        Route::patch('{user}/demote', 'UserController@demoteUser')->name('admin.users.demote');
-    }
-);
+//US7
+Route::get('/users/{user}/block', 'UserController@blockUser')->middleware('admin')->name('block.user');
+Route::patch('/users/{user}/block', 'UserController@blockUser')->middleware('admin')->name('block.user');
 
-Route::group(
-    ['prefix'=>'me',
-    ],
-    function(){
-        //US9
-        Route::get('password','UserController@showChangePasswordForm')->name('me.passwordForm');
-        Route::patch('password', 'UserController@changePassword')->name('me.password');
-        //US10
-        Route::get('profile','UserController@showEditMyProfileForm')->name('me.profileForm');
-        Route::put('profile', 'UserController@updateMyProfile')->name('me.profile');
-        //US12
-        Route::get('associates', 'UserController@getAssociates')->name('me.associates');
+Route::get('/users/{user}/unblock', 'UserController@unblockUser')->middleware('admin')->name('unblock.user');
+Route::patch('/users/{user}/unblock', 'UserController@unblockUser')->middleware('admin')->name('unblock.user');
 
-        Route::get('accounts',function(){
-            return redirect()->route('accounts.opened',Auth::id());
-        })->name('me.accounts');
+ // promove user para admin
+Route::get('/users/{user}/promote', 'UserController@promoteUser')->middleware('admin')->name('promote.user');
+Route::patch('/users/{user}/promote', 'UserController@promoteUser')->middleware('admin')->name('promote.user');
 
-        //US13
-        Route::get('associate-of','UserController@getAssociateOfMe')->name('me.associateOf');
-    }
-);
+  // tira admin do user
+Route::get('/users/{user}/demote', 'UserController@demoteUser')->middleware('admin')->name('demote.user');
+Route::patch('/users/{user}/demote', 'UserController@demoteUser')->middleware('admin')->name('demote.user');
 
+//US9
+//acrescentei esta rota apenas para mostrar o formulario
+Route::get('/me/password','UserController@showChangePasswordForm')->name('me.passwordForm');
+Route::patch('/me/password', 'UserController@changePassword')->name('me.password');
+
+//US10
+Route::get('/me/profile','UserController@showEditMyProfileForm')->name('me.profileForm');
+Route::put('/me/profile', 'UserController@updateMyProfile')->name('me.profile');
 
 //US11
-Route::get('/profiles', 'UserController@getProfile')->name('profiles');
+Route::get('/profiles', 'UserController@getProfile')->name('users.profiles');
 
-Route::group(
-    ['prefix'=>'me',
-    ],
-    function(){
-        //US9
-        Route::get('password','UserController@showChangePasswordForm')->name('me.passwordForm');
-        Route::patch('password', 'UserController@changePassword')->name('me.password');
-        //US10
-        Route::get('profile','UserController@showEditMyProfileForm')->name('me.profileForm');
-        Route::put('profile', 'UserController@updateMyProfile')->name('me.profile');
+//US12
+Route::get('/me/associates', 'UserController@getAssociates')->name('users.associates');
 
-        Route::group(
-            ['prefix'=>'associates',],
-            function(){
-                //US12
-                Route::get('/', 'UserController@getAssociates')->name('me.associates');
-                //US.29
-                Route::post('/','UserController@create')->name('me.associates.create');
-                //US.30
-                Route::delete('/{user}','UserController@destroy')->name('me.associate.destroy');
-            }
-        );
+Route::get('/me/associate-of','UserController@getAssociateOfMe')->name('me.associateOf');
+Route::get('/accounts/{user}','AccountController@showAccounts')->name('accounts');
+Route::get('/accounts/{user}/opened','AccountController@showOpenAccounts')->name('accounts.opened');
+Route::get('/accounts/{user}/closed','AccountController@showCloseAccounts')->name('accounts.closed');
+Route::delete('/account/{account}', 'AccountController@destroy')->name('account.delete');
+Route::get('/account/{account}/close','AccountController@updateClose')->name('account.close');
+Route::patch('/account/{account}/close','AccountController@updateClose')->name('account.close');
+Route::patch('/account/{account}/reopen','AccountController@updateReopen')->name('account.reopen');
+Route::post('/account','AccountController@store')->name('accounts.store');
+Route::put('/account/{account}','AccountController@update')->name('accounts.editAccount');
 
-        //US.26
-        Route::get('dashboard','UserController@show')->name('me.dashboard');
+//US.20
+Route::get('/movements/{account}','MovementController@index')->name('movement.index');
+//US.21
+Route::get('/movements/{account}/create','MovementController@create')->name('movement.create');
+//US.21
+Route::post('/movements/{account}/create','MovementController@store')->name('movement.store');
+//US.21
+Route::get('/movement/{movement}','MovementController@edit')->name('movement.edit');
+//US.21
+Route::put('/movement/{movement}','MovementController@update')->name('movement.update');
+//US.21
+Route::delete('/movement/{movement}','MovementController@destroy')->name('movement.destroy');
 
-        Route::get('accounts',function(){
-            return redirect()->route('accounts.opened',Auth::id());
-        })->name('me.accounts');
-
-        //US13
-        Route::get('associate-of','UserController@getAssociateOfMe')->name('me.associateOf');
-    }
-);
-
-Route::group(
-    ['prefix'=>'accounts',
-    ],
-    function(){
-        //US14
-        Route::get('{user}','AccountController@show')->name('accounts');
-        Route::get('{user}/opened','AccountController@showOpenAccounts')->name('accounts.opened');
-        Route::get('{user}/closed','AccountController@showCloseAccounts')->name('accounts.closed');
-    }
-);
-
-Route::group(
-    ['prefix'=>'account',
-    ],
-    function(){
-        //US15
-        Route::delete('{account}', 'AccountController@destroy')->name('account.delete');
-        Route::get('{account}/close','AccountController@updateClose')->name('account.getClose');
-        Route::patch('{account}/close','AccountController@updateClose')->name('account.close');
-        //US16
-        Route::patch('{account}/reopen','AccountController@updateReopen')->name('account.reopen');
-        //US17
-        Route::get('/','AccountController@create')->name('account.create');
-        Route::post('/','AccountController@store')->name('account.store');
-        //US18
-        Route::get('{account}','AccountController@edit')->name('account.edit');/*->middleware('can:edit-account,account_id');*/
-        Route::put('{account}','AccountController@update')->name('account.update');
-    }
-);
-
-Route::group(
-    ['prefix'=>'movements',
-    ],
-    function(){
-        //US.20
-        Route::get('{account}','MovementController@index')->name('movements.index');
-        //US.21
-        Route::get('{account}/create','MovementController@create')->name('movements.create');
-        //US.21
-        Route::post('{account}/create','MovementController@store')->name('movements.store');
-        //US.21
-        Route::get('{account}/{movement}','MovementController@edit')->name('movements.edit');
-        //US.21
-        Route::put('{account}/{movement}','MovementController@update')->name('movements.update');
-        //US.21
-        Route::delete('{account}/{movement}','MovementController@destroy')->name('movements.destroy');
-    }
-);
-
-Route::group(
-    ['prefix'=>'documents',
-    ],
-    function(){
-        //US23
-        Route::get('{movement}','DocumentController@create')->name('documents.create');
-        Route::post('{movement}','DocumentController@update')->name('documents.update');
-    }
-);
-
-Route::group(
-    ['prefix'=>'document',
-    ],
-    function(){
-        //US.24
-        Route::delete('{document}','DocumentController@destroy')->name('document.destroy');
-        //US.25
-        Route::get('{document}','DocumentController@show')->name('document.show');
-    }
-);
+//US.24
+Route::delete('/documents/{movement}/{document}','DocumentController@destroy')->name('documents.destroy');
+//US.25
+Route::get('/documents/{movement}/{document}','DocumentController@getDoc')->name('documents.getdoc');
+//US.26
+Route::get('/me/dashboard','UserController@showSummary')->name('user.summary');
+//US.29
+Route::post('/me/associates','UserController@createAssociate')->name('users.associate.create');
+//US.30
+Route::delete('/me/associates/{user}','UserController@destroyAssociate')->name('users.associate.destroy');

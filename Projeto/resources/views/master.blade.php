@@ -19,7 +19,7 @@
         <!-- Styles -->
         <link href="{{ asset('css/app.css') }}" rel="stylesheet">
         <!--fim laravel-->
-
+        
         <!-- Latest compiled and minified CSS & JS -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
         <link rel="stylesheet" href="css/style.css">
@@ -59,9 +59,18 @@
                                     <a class="dropdown-item" href="{{ route('home') }}">
                                         My Profile
                                     </a>
+                                    <a class="dropdown-item" href="{{ action('AccountController@showAccounts', Auth::user()->id) }}">
+                                        My Accounts
+                                    </a>
                                     <!--Acrescentar novas opcoes de menu aqui-->
+                                    <a class="dropdown-item" href="{{ route('me.passwordForm') }}">
+                                        Change My Password
+                                    </a>
+                                    <a class="dropdown-item" href="{{ route('me.profileForm') }}">
+                                        Update My Profile
+                                    </a>
                                     @can('admin')
-                                    <a class="dropdown-item" href="{{route('admin.users') }}">
+                                    <a class="dropdown-item" href="{{route('list.of.all.users') }}">
                                         Administration Options
                                     </a>
                                     @endcan

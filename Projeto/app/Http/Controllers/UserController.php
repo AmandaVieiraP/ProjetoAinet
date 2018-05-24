@@ -94,11 +94,14 @@ class UserController extends Controller
         //
     }
 
+     //US5 e US6--------------------------------------------------------
     public function listAllUsersToAdmin(Request $request) {
+
         $pagetitle = "List of Users";
         $users=UserController::filter($request);
 
-        return view('users.listUsersToAdmin', compact('users', 'pagetitle'));   
+        return view('users.listUsersToAdmin', compact('users', 'pagetitle')); 
+        
     }
 
     private static function filter(Request $request){
@@ -209,7 +212,8 @@ class UserController extends Controller
         }
     }
     //------------------------------------------------------------------------
-    
+
+
     public function blockUser(Request $request, $user) {
         $userToBlock = User::findOrFail($user);
         if (Auth::user()->id == $userToBlock->id) {
@@ -217,12 +221,12 @@ class UserController extends Controller
             return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
         if ($userToBlock->blocked == 1) {
-            return redirect()->route('admin.users')->with('errorMsg', "User is already blocked"); 
+            return redirect()->route('list.of.all.users')->with('errorMsg', "User is already blocked"); 
         } 
         $userToBlock->blocked = 1;
         $userToBlock->save();
 
-        return redirect()->route('admin.users')->with('successMsg', "User was blocked succesfully"); 
+        return redirect()->route('list.of.all.users')->with('successMsg', "User was blocked succesfully"); 
     }
 
     public function unblockUser(Request $request, $user) {
@@ -234,14 +238,13 @@ class UserController extends Controller
             return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
         if ($userToUnblock->blocked == 0) {
-            return redirect()->route('admin.users')->with('errorMsg', "User is already not blocked");
+            return redirect()->route('list.of.all.users')->with('errorMsg', "User is already not blocked");
         };
         $userToUnblock->blocked = 0;
         $userToUnblock->save();
-       /* $request->session()->flash('successMsg', 'User unblocked succesufully!');
-        return $this->listAllUsersToAdmin($request); */
 
-        return redirect()->route('admin.users')->with('successMsg', "User was unblocked succesfully"); 
+
+        return redirect()->route('list.of.all.users')->with('successMsg', "User was unblocked succesfully"); 
     }
 
     public function promoteUser(Request $request, $user) {
@@ -251,12 +254,12 @@ class UserController extends Controller
             return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
         if ($userToPromote->admin == 1) {
-            return redirect()->route('admin.users')->with('errorMsg', "User is already admin");
+            return redirect()->route('list.of.all.users')->with('errorMsg', "User is already admin");
         };
         $userToPromote->admin = 1;
         $userToPromote->save();
 
-        return redirect()->route('admin.users')->with('successMsg', "User was promoted succesfully"); 
+        return redirect()->route('list.of.all.users')->with('successMsg', "User was promoted succesfully"); 
     }
 
     public function demoteUser(Request $request, $user) {
@@ -266,11 +269,11 @@ class UserController extends Controller
             return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
         if ($userToDemote->admin == 0) {
-            return redirect()->route('admin.users')->with('errorMsg', "User is already not admin");
+            return redirect()->route('list.of.all.users')->with('errorMsg', "User is already not admin");
         };
         $userToDemote->admin = 0;
         $userToDemote->save();
-        return redirect()->route('admin.users')->with('successMsg', "User was demoted succesfully"); 
+        return redirect()->route('list.of.all.users')->with('successMsg', "User was demoted succesfully"); 
     }
 
      public function showChangePasswordForm(){
@@ -282,7 +285,13 @@ class UserController extends Controller
         if ($request->has('cancel')) {
             return redirect()->route('home');
         }
-        
+
+        //validação:
+        //require-> campo tem de estar preenchido
+        //confirmed-> existe um campo que há pelo menos outro campo igual no questionario e que é diferente de old_passwod
+         
+         // A password change fails with invalid old password
+         // 
         $validatedData=$request->validate([
             'old_password'=>'required',
             'password'=>'required|confirmed|min:3|different:old_password',
@@ -322,7 +331,7 @@ class UserController extends Controller
         }
 
         $validatedData=$request->validate([
-            'name'=>'required|regex:/(^[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÊÍÏÓÒÖÚÇÑ ]+$)+/',
+            'name'=>'required|regex:/(^[A-Za-z ]+$)+/',
             'phone'=>'nullable|regex:/(^[0-9\+ ]+$)+/',
             'email' => 'email|required|'.Rule::unique('users')->ignore(Auth::User()->id),
             'profile_photo'=>'nullable|image|mimes:png,jpeg,jpg',
@@ -347,12 +356,11 @@ class UserController extends Controller
 
 
         if ($request->hasFile('profile_photo')) {
-            $image=$request->file('profile_photo');
-            $path = basename($image->store('profiles', 'public'));
+            $path= Storage::putFile('public/profiles/', $request->file('profile_photo'));
             $user->profile_photo=basename($path);
         }
 
-        $user->save();
+        $user->update();
 
         return redirect()->route('home')->with('success', 'Your update has been updated');
     }
@@ -384,9 +392,7 @@ class UserController extends Controller
     }
 
     public function getAssociateOfMe(){
-        $pagetitle = "Users that I'm associated";
-        $users = Auth::user()->associated_of;
-        return view('users.listofAssociateMembersOf', compact('users', 'pagetitle'));        
+        
 
     }
     public function createAssociate(){
