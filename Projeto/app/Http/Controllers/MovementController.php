@@ -33,18 +33,17 @@ class MovementController extends Controller
     public function index($id)  // account id
     {
         $account = Account::findOrFail($id);
-
-        if (Gate::denies('view-account-movements', $account)) {
+        $accountOwner = $account->user;
+        if (Auth::user()->id != $accountOwner->id) {
             $pagetitle = "Unauthorized";
             return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
 
-
-        $movements = $account->movementsOrderByDateDesc;  //->sortByDesc('date');
+        $movements = $account->movements->sortByDesc('date');
         $movementCategories = MovementCategories::all();
 
         $pagetitle = "Movements";
-        return view('users.listMovementsOfAccount', compact('movements', 'movementCategories', 'account', 'pagetitle'));
+        return view('movements.listMovementsOfAccount', compact('movements', 'movementCategories', 'account', 'pagetitle'));
     }
 
     /**
@@ -72,7 +71,7 @@ class MovementController extends Controller
 
         $movement = new Movement();
         $document = new Document();
-        return view('users.createMovement', compact('account', 'movement', 'movementsCategories', 'pagetitle', 'document'));
+        return view('movements.createMovement', compact('account', 'movement', 'movementsCategories', 'pagetitle', 'document'));
     }
 
     /**
@@ -213,7 +212,7 @@ class MovementController extends Controller
         }
 
         $pagetitle = "Edit Movement";
-        return view('users.editMovement', compact('movement', 'movementsCategories', 'account', 'pagetitle', 'document'));
+        return view('movements.editMovement', compact('movement', 'movementsCategories', 'account', 'pagetitle', 'document'));
     }
 
     /**

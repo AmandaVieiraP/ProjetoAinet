@@ -9,10 +9,13 @@ class Account extends Model
 {
     //
     use SoftDeletes;
-	//protected $dates = ['deleted_at'];
+    protected $fillable = [
+         'owner_id', 'account_type_id', 'date','code','description','start_balance','current_balance',
+    ];
+    //protected $dates = ['deleted_at'];
 
     public $timestamps = false;
-	
+    
     public function user() {
         return $this->belongsTo('App\User', 'owner_id');
     }
@@ -22,7 +25,11 @@ class Account extends Model
     }
 
     public function movementsOrderByDateDesc() {
-        return $this->hasMany('App\Movement')->orderBy('date', 'desc')->orderBy('created_at', 'desc');
+        return $this->hasMany('App\Movement')->orderBy('date');
+    }
+
+    public function accountType() {
+        return $this->belongsTo('App\AccountType');
     }
 
     /* public function getUpdatedAtColumn() {

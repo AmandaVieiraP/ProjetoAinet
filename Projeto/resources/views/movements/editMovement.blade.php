@@ -25,7 +25,7 @@
 <form method="POST" action="{{ route('movement.update', $movement->id) }}" enctype="multipart/form-data">
     @csrf
     @method('put')
-    @include('partials.addEditMovement')
+    @include('movements.partials.addEditMovement')
 
     <div class="form-group">
     	<div class="col-sm-offset-5 col-sm-6">

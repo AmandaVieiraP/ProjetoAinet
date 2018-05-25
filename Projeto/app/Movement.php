@@ -11,6 +11,8 @@ class Movement extends Model
     	'value' => 'float',
 	];
 
+    public $timestamps  = false;
+
 	protected $fillable = [
          'account_id', 'movement_category_id', 'date', 'value', 'start_balance', 'end_balance', 'description', 'type', 'document_id'
     ];
@@ -19,8 +21,18 @@ class Movement extends Model
         return $this->belongsTo('App\Account');
     }
 
-    public function setUpdatedAtAttribute($value)
-	{
-	}
+    public function document() {
+        return $this->belongsTo('App\Document');
+    }
+
+    //Para garantir que quando cria coloca o created_at
+    public static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $model->created_at = $model->freshTimestamp();
+        });
+    }
 
 }

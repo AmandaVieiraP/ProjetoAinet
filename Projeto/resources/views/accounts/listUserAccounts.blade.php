@@ -87,7 +87,4 @@
    <h5>No accounts found</h5>
 
 @endif
-
-
-
 @endsection('content')

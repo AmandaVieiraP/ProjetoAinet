@@ -57,7 +57,31 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        //
+        if (Auth::user()->id!=$id) {
+            $pagetitle = "Unauthorized";
+            return Response::make(view('errors.403', compact('pagetitle')), 403);
+        }
+
+        $pagetitle="Dashboard";
+
+        $user=User::findOrFail($id);
+
+        $accounts=Auth::user()->openAccounts;
+
+        $summary = $accounts->pluck('current_balance');
+
+        $total = $summary->sum();
+
+        $percentage=[];
+
+        foreach ($accounts as $a) {
+            if($a->current_balance!=0)
+                $percentage[]=number_format(abs($a->current_balance/$total * 100),2);
+            else
+                $percentage[]=0;
+        }
+
+        return view('accounts.dashboard', compact('pagetitle','user','accounts','summary','total', 'percentage')); 
     }
 
     /**
@@ -325,13 +349,13 @@ class UserController extends Controller
         return view('users.editMyProfile', compact('pagetitle'));
     }
 
-    public function updateMyProfile(Request $request){
+public function updateMyProfile(Request $request){
         if ($request->has('cancel')) {
             return redirect()->route('home');
         }
 
         $validatedData=$request->validate([
-            'name'=>'required|regex:/(^[A-Za-z ]+$)+/',
+            'name'=>'required|regex:/(^[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÊÍÏÓÒÖÚÇÑ ]+$)+/',
             'phone'=>'nullable|regex:/(^[0-9\+ ]+$)+/',
             'email' => 'email|required|'.Rule::unique('users')->ignore(Auth::User()->id),
             'profile_photo'=>'nullable|image|mimes:png,jpeg,jpg',
@@ -356,11 +380,12 @@ class UserController extends Controller
 
 
         if ($request->hasFile('profile_photo')) {
-            $path= Storage::putFile('public/profiles/', $request->file('profile_photo'));
+            $image=$request->file('profile_photo');
+            $path = basename($image->store('profiles', 'public'));
             $user->profile_photo=basename($path);
         }
 
-        $user->update();
+        $user->save();
 
         return redirect()->route('home')->with('success', 'Your update has been updated');
     }
@@ -392,7 +417,9 @@ class UserController extends Controller
     }
 
     public function getAssociateOfMe(){
-        
+        $pagetitle = "Users that I'm associated";
+        $users = Auth::user()->associated_of;
+        return view('users.listofAssociateMembersOf', compact('users', 'pagetitle'));        
 
     }
     public function createAssociate(){

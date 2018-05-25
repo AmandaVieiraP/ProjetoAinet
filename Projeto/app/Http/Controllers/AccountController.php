@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Response;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\AccountType;
 use App\Account;
+use Carbon\Carbon;
+use Illuminate\Validation\Rule;
 
 
 class AccountController extends Controller
@@ -33,7 +35,10 @@ class AccountController extends Controller
      */
     public function create()
     {
-        //
+        $pagetitle="Add New Account";
+        $types = AccountType::all();
+
+        return view('accounts.createAccount', compact('pagetitle','types')); 
     }
 
     /**
@@ -44,7 +49,55 @@ class AccountController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        if($request->has('cancel'))
+            return redirect()->route('accounts',Auth::user()->id);
+
+        $accounts=Auth::user()->allAccounts;
+
+        $types=[];
+        $codes=[];
+        
+        foreach($accounts as $a){
+            $types[]=$a->account_type_id;
+            $codes[]=$a->code;
+        }
+
+        $validatedData=$request->validate([
+           'account_type_id' =>'required|exists:account_types,id',
+           'code'=>'required',
+           'date'=>'date',
+           'start_balance'=>'required',
+           'description'=>'nullable',
+        ], [ 
+            'account_type_id.required' => 'The account type can not be empty',
+            'account_type_id.exists' => 'The type choosen is not valid',
+            'code.required' => 'The code can not be empty',
+            'date.date' => 'The date is invalid',
+            'start_balance.required'=> 'The start balance value can not be empty',
+
+        ]);
+
+        if(!is_numeric($request->input('start_balance'))){
+            return redirect()->route('account.store')->withErrors(['start_balance' => 'The start_balance must be a numeric value in format <0.00>']);
+        }
+
+        if(in_array($request->input('account_type_id'),$types)){
+            return redirect()->route('account.store')->withErrors(['account_type_id' => 'You already have an account with this type']);
+        }
+
+        if(in_array($request->input('code'),$codes)){
+            return redirect()->route('account.store')->withErrors(['code' => 'The code is already in use']);
+        }
+
+        if(!$request->filled('date')){
+            $validatedData['date']=Carbon::now();
+        }
+
+        $validatedData['current_balance']=$request->input('start_balance');
+        $validatedData['owner_id']=Auth::user()->id;
+        $account=Account::create($validatedData);
+
+        return redirect()->route('accounts',Auth::user()->id)->with('successMsg', 'Account created!');
     }
 
     /**
@@ -66,7 +119,17 @@ class AccountController extends Controller
      */
     public function edit($id)
     {
-        //
+        $types= AccountType::all();
+        $account = Account::findOrFail($id);
+        $pagetitle = "Update Account";
+
+        if (Auth::user()->can('edit-account', $id)) {
+            return view('accounts.editAccount', compact('types','account','pagetitle'));    
+        }
+        else{
+            $pagetitle = "Unauthorized";
+            return Response::make(view('errors.403', compact('pagetitle')), 403);
+        }
     }
 
     /**
@@ -78,7 +141,37 @@ class AccountController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        if ($request->has('cancel')) {
+            return redirect()->route('home');
+        }
+        $account = Account::findOrFail($id);
+        if (!Auth::user()->can('edit-account', $id)) {
+            $pagetitle = "Unauthorized";
+            return Response::make(view('errors.403', compact('pagetitle')), 403);
+        }
+
+        $validatedData=$request->validate([
+            'code'=> ['required', Rule::unique('accounts')->where(function ($query){
+               return $query->where('owner_id', Auth::id());
+            })],
+            'account_type_id'=>['required', 'exists:account_types,id',Rule::unique('accounts')->where(function ($query){
+               return $query->where('owner_id', Auth::id());
+            })],
+            'start_balance' => 'required|numeric|min:0',
+            'description'=>'nullable|string',
+            'date'=>'required|date',
+        ], [ 
+            'account_type_id.required' => 'The account type can not be empty',
+            'account_type_id.exists' => 'The type choosen is not valid',
+            'code.required' => 'The code can not be empty',
+            'date.required' => 'The date field can not be empty',
+            'date.date' => 'The date is invalid',
+            'start_balance.required'=> 'The start balance value can not be empty',       
+        ]);
+
+        $account->fill($validatedData);
+        $account->update();
+        return redirect()->route('accounts',Auth::user()->id)->with('successMsg', 'Your account has been updated');
     }
 
     /**
@@ -120,7 +213,7 @@ class AccountController extends Controller
 
         $pagetitle = "User's accounts";
         
-        return view('users.listUserAccounts', compact('accounts', 'accounts_type', 'user', 'pagetitle')); 
+        return view('accounts.listUserAccounts', compact('accounts', 'accounts_type', 'user', 'pagetitle')); 
     }
 
     public function showOpenAccounts($user){
@@ -141,7 +234,7 @@ class AccountController extends Controller
 
         $pagetitle = "User's open accounts";
 
-        return view('users.listUserAccounts', compact('accounts', 'accounts_type', 'user', 'pagetitle')); 
+        return view('accounts.listUserAccounts', compact('accounts', 'accounts_type', 'user', 'pagetitle')); 
 
     }
     public function showCloseAccounts($user){
@@ -157,7 +250,7 @@ class AccountController extends Controller
 
         $pagetitle = "User's closed accounts";
 
-        return view('users.listUserAccounts', compact('accounts', 'accounts_type', 'user', 'pagetitle')); 
+        return view('accounts.listUserAccounts', compact('accounts', 'accounts_type', 'user', 'pagetitle')); 
     }
 
     public function updateClose($account){

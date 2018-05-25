@@ -45,9 +45,23 @@ class User extends Authenticatable
         return $this->hasMany('App\Account', 'owner_id')->onlyTrashed();
     }
 
+    public function openAccounts(){
+        return $this->hasMany('App\Account', 'owner_id');
+    }
+
     public function movements() {
         return $this->hasMany('App\Movement');
     }
 
-    
+    public function isOwner($account_id)
+    {
+        $useraccounts = $this->allAccounts;
+          foreach ($useraccounts as $acc) {
+              if($acc->id == $account_id){
+                return true;
+              }
+          }
+         
+            return false;
+    }
 }

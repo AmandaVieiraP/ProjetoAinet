@@ -73,34 +73,29 @@
                     @else 
                         <div class='col-xs-3'>
                         @if($user->blocked == 1)
-                            
-                            <form action="{{ action('UserController@unblockUser', $user->id) }}" method="POST" role="form" class="btn-block">
+                            <form action="{{ route('unblock.user',['user' => $user->id]) }}" method="POST" role="form" class="btn-block">
                             @csrf
                             @method('patch')
-                            <input type="hidden" name="user_id" value="{{ $user->id }} ?>">
-                            <button type="submit" class="btn btn-xs btn-secondary btn-block">Unblock</button>
+                            <button type="submit" class="user-is-blocked btn btn-xs btn-secondary btn-block">Unblock</button>
                             </form>
                          @else 
-                            <form action="{{ action('UserController@blockUser', $user->id) }}" method="POST" role="form" class="btn-block">
+                            <form action="{{ route('block.user',['user' => $user->id]) }}" method="POST" role="form" class="btn-block">
                             @csrf
                             @method('patch')
-                            <input type="hidden" name="user_id" value="{{ $user->id }} ?>">
                             <button type="submit" class="btn btn-xs btn-secondary btn-block">Block</button>
                             </form> 
                          @endif   
                          {{-- parte do demote --}}
                          @if($user->admin == 1)
-                            <form action="{{ action('UserController@demoteUser', $user->id) }}" method="POST" role="form" class="btn-block">
+                             <form action="{{ route('demote.user',['user' => $user->id]) }}" method="POST" role="form" class="btn-block">
                             @csrf
                             @method('patch')
-                            <input type="hidden" name="user_id" value="{{ $user->id }} ?>">
-                            <button type="submit" class="btn btn-xs btn-secondary btn-block">Demote</button>
+                            <button type="submit" class="user-is-admin btn btn-xs btn-secondary btn-block">Demote</button>
                             </form>
                          @else 
-                            <form action="{{ action('UserController@promoteUser', $user->id) }}" method="POST" role="form" class="btn-block">
+                            <form action="{{ route('promote.user',['user'=> $user->id]) }}" method="POST" role="form" class="btn-block">
                             @csrf
                             @method('patch')
-                            <input type="hidden" name="user_id" value="{{ $user->id }} ?>">
                             <button type="submit" class="btn btn-xs btn-secondary btn-block">Promote</button>
                             </form>        
                          @endif 

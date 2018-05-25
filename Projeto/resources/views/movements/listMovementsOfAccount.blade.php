@@ -16,9 +16,22 @@
 </br>
 
 @if (is_null($account->deleted_at))
-<div class='float-left' id='espaco'> 
-    <a class="btn btn-xs btn-secondary" href="{{ route('movement.create', $account->id) }}">Add Movement</a>
-</div>
+<nav class="navbar navbar-expand-lg navbar-light bg-light
+    ">
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li>
+            <a class="nav-link" href="{{ route('movement.create', $account->id) }}">Add Movement</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <br>
 @endif
 
 @if(count($movements))
@@ -31,6 +44,7 @@
                 <th>Type</th>
                 <th>End Balance</th>
                 <th>Actions</th>
+                <th colspan="3">Document</th>
             </tr>
         </thead>
         <tbody>
@@ -56,6 +70,24 @@
                         <button type="submit" class="btn btn-xs btn-secondary btn-block">Delete</button>
                     </form> 
                 </td>
+                <td>
+                    <a href="{{ route('documents.create',['movement' => $movement->id]) }}" class="btn btn-secondary btn-xs">Upload</a>
+                </td>
+                @if (!is_null($movement->document_id))
+                <td>
+                    <a href="{{ route('document.show',['document'=>$movement->document_id])}}"  class="btn btn-secondary btn-xs">Download</a>
+                </td>
+                <td>
+                    <form action="{{ route('document.destroy',['document'=>$movement->document_id]) }}" method="POST">
+                        @method('delete')
+                        @csrf
+                        <button type="submit" class="btn btn-secondary btn-xs">Delete</button>
+                    </form>
+                </td>
+                @else
+                <td></td>
+                <td></td>
+                @endif
             </tr>
         @endforeach
     </table>
