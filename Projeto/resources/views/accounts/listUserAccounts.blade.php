@@ -13,14 +13,29 @@
         @endalert
 @endif
 
-<div class='float-left' id='espaco'>
-	<h4> <b>User: </b> {{ $user->name }} </h4>
-</div>
-<div class='float-right' id='espaco'> 
-	<a class="btn btn-xs btn-secondary" href="{{ action('AccountController@showAccounts', $user->id) }}">All Accounts</a>
-	<a class="btn btn-xs btn-secondary" href="{{ action('AccountController@showOpenAccounts', $user->id) }}">Only Open Accounts</a>
-	<a class="btn btn-xs btn-secondary" href="{{ action('AccountController@showCloseAccounts', $user->id) }}">Only Closed Accounts</a>
-</div>
+<h4 id='espaco'> <b>User: </b> {{ $user->name }} </h4>
+<nav class="navbar navbar-expand-lg navbar-light bg-light
+    ">
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li>
+            <a class="nav-link" href="{{ route('accounts', ['user'=>$user->id]) }}">All Accounts</a>
+          </li>
+          <li>
+            <a class="nav-link" href="{{ route('accounts.opened', ['user'=>$user->id]) }}">Only Open Accounts</a>
+          </li>
+          <li>
+            <a class="nav-link" href="{{ route('accounts.closed', ['user'=>$user->id]) }}">Only Close Accounts</a>
+          </li>
+        </ul>
+      </div>
+</nav>
+<br>
 
 @if (count($accounts))
     <table class="table table-striped">
