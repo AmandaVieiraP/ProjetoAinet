@@ -86,6 +86,7 @@ Route::put('/movement/{movement}','MovementController@update')->name('movement.u
 //US.21
 Route::delete('/movement/{movement}','MovementController@destroy')->name('movement.destroy');
 
+
 //US23
 Route::group(
     ['prefix'=>'documents',
@@ -112,5 +113,9 @@ Route::group(
 Route::get('/dashboard/{user}','UserController@show')->name('dashboard');
 //US.29
 Route::post('/me/associates','UserController@createAssociate')->name('users.associate.create');
+//US.30 ACRESCENTADO
+Route::get('/me/associates/{user}', function(){
+    return redirect()->route('users.associates');
+})->name('users.show.associates');
 //US.30
 Route::delete('/me/associates/{user}','UserController@destroyAssociate')->name('users.associate.destroy');

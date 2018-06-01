@@ -60,5 +60,7 @@ class AuthServiceProvider extends ServiceProvider
             $accountOwner = $account->user;
             return $user->id == $accountOwner->id;
         });
+
+    
     }
 }

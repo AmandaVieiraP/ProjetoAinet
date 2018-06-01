@@ -10,6 +10,8 @@
             <th>Name</th>
             <th>Email</th>
             <th>Phone</th>
+            <th>Actions</th>
+
         </tr>
     </thead>
     <tbody>
@@ -29,6 +31,14 @@
             <td>{{ $user->name }}</td>
             <td>{{ $user->email }}</td>
             <td>{{ $user->phone }}</td>
+            <td> 
+            <form action="{{ route('users.associate.destroy', 200) }}" method="post" role="form" class="btn-block">
+                    @csrf
+                    @method('delete')
+                    <input type="hidden" name="id" value="{{ 200 }} ?>"> 
+                <button type="submit" class="btn btn-xs btn-secondary btn-block">Remove</button>
+            </form>
+            </td>
         </tr>
     @endforeach
     </table>

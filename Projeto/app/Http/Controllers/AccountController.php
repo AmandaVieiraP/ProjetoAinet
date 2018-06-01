@@ -11,7 +11,8 @@ use App\AccountType;
 use App\Account;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
-
+use App\Movement;
+use \App\Http\Requests\StoreAccount;
 
 class AccountController extends Controller
 {
@@ -139,7 +140,7 @@ class AccountController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(StoreAccount $request, $id)
     {
         if ($request->has('cancel')) {
             return redirect()->route('home');
@@ -149,29 +150,36 @@ class AccountController extends Controller
             $pagetitle = "Unauthorized";
             return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
-
-        $validatedData=$request->validate([
-            'code'=> ['required', Rule::unique('accounts')->where(function ($query){
-               return $query->where('owner_id', Auth::id());
-            })],
-            'account_type_id'=>['required', 'exists:account_types,id',Rule::unique('accounts')->where(function ($query){
-               return $query->where('owner_id', Auth::id());
-            })],
-            'start_balance' => 'required|numeric|min:0',
-            'description'=>'nullable|string',
-            'date'=>'required|date',
-        ], [ 
-            'account_type_id.required' => 'The account type can not be empty',
-            'account_type_id.exists' => 'The type choosen is not valid',
-            'code.required' => 'The code can not be empty',
-            'date.required' => 'The date field can not be empty',
-            'date.date' => 'The date is invalid',
-            'start_balance.required'=> 'The start balance value can not be empty',       
-        ]);
-
+          $validatedData=  $request->validated();;
+  
+        $old_bal = $account->start_balance;
         $account->fill($validatedData);
+
+      if($old_bal != $account->start_balance){
+          $movements=Movement::where('account_id', '=', $account->id)->orderBy('date')->get();
+          if(count($movements)==0){
+            $account->current_balance = $validatedData['start_balance'];  
+          }
+          else{ 
+            $ultimo=$account->start_balance;
+            foreach ($movements as $mov) {
+              $mov->start_balance = $ultimo;
+              if(strcmp($mov->type,"expense") ==0){
+                $mov->end_balance= round($mov->start_balance - $mov->value,2);
+              }else{
+                $mov->end_balance= round($mov->start_balance + $mov->value,2);  
+              }
+              $ultimo = round($mov->end_balance,2);
+              $mov->update();
+            }
+              //$movements->update();
+              $account->current_balance = round($ultimo,2);
+          }
+
+        }  
+
         $account->update();
-        return redirect()->route('accounts',Auth::user()->id)->with('successMsg', 'Your account has been updated');
+        return redirect()->route('home')->with('success', 'Your account has been updated');
     }
 
     /**
