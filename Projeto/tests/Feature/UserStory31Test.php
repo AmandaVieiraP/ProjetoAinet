@@ -50,7 +50,8 @@ class UserStory31Test extends BaseAccountsTest
             'main_user_id' => $this->users[0]->id,
             'associated_user_id' => $this->mainUser->id,
         ]);
-
+         //dd($this->users[0]->id);
+         //dd($this->mainUser->id);
         $this->actingAs($this->users[0])
             ->get('/accounts/'.$this->mainUser->id)
             ->assertForbidden();

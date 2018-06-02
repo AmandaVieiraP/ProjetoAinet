@@ -445,4 +445,9 @@ public function updateMyProfile(Request $request){
     public function showSummary(){
         
     }
+    public function getFinancialInfo($id)
+    {
+        $user = User::findOrFail($id);
+        
+    }
 }

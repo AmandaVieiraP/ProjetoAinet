@@ -71,9 +71,8 @@ class UserStory18Test extends BaseAccountsTest
         // Given, When, Then
         $account = $this->seedOpenedAccountsForUser($this->mainUser->id)
             ->first();
-
         $data = [
-            'account_type_id' => 20,
+            'account_type_id' => 200000,
             'code' => $this->faker->uuid,
             'date' => Carbon::now()->format('Y-m-d'),
             'start_balance' => 0,
@@ -196,7 +195,7 @@ class UserStory18Test extends BaseAccountsTest
     {
         // @codingStandardsIgnoreEnd
         // Given, When, Then
-        $this->seedUserAccount($this->adminUser, $this->types[0]->id, ['code' => 'test-code']);
+        $this->seedUserAccount($this->adminUser->id, $this->types[0]->id, ['code' => 'test-code']);
         $account = $this->seedOpenedAccountsForUser($this->mainUser->id)
             ->first();
         $data = [
@@ -208,7 +207,8 @@ class UserStory18Test extends BaseAccountsTest
 
         $this->actingAs($this->mainUser)
             ->put('/account/'.$account->id, $data)
-            ->assertSuccessfulOrRedirect();
+            ->assertSuccessfulOrRedirect()
+            ->assertSessionHasNoErrors(['code']);
 
         $this->assertDatabaseHas('accounts', ['id' => $account->id, 'code' => $data['code']]);
     }

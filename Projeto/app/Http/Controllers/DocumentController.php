@@ -63,6 +63,12 @@ class DocumentController extends Controller
     {
         $document=Document::findOrFail($id);
 
+     //   if(Gate::denies('associates-view-documents', $id))
+     //   {
+     //     $pagetitle = "Unauthorized";
+     //     return Response::make(view('errors.403', compact('pagetitle')), 403);
+     //   }
+
         $movement=Movement::where('document_id',$id)->first();
 
         if(Gate::forUser(Auth::user())->denies('download-document',$id)){

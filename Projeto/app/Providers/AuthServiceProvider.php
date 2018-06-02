@@ -51,6 +51,14 @@ class AuthServiceProvider extends ServiceProvider
                 if($user==$u)
                     return true;
             }
+            
+
+            $documentOwner = Account::findOrFail($document_id)->user;
+            $associateds = $user->associated_of; 
+            foreach ($associateds as $u) {
+                if($u->id==$documentOwner->id)
+                    return true;
+            }
 
             return $user->id==$account->owner_id;
 
@@ -61,6 +69,37 @@ class AuthServiceProvider extends ServiceProvider
             return $user->id == $accountOwner->id;
         });
 
+        Gate::define('view-accounts', function ($user, $userId){
+         
+            $associated_of = $user->associated_of;  
+            foreach ($associated_of as $u) {
+                if($u->id==$userId)
+                    return true;
+            }
+
+            $associateds = $user->associateds;
+            
+            foreach ($associated_of as $u) {
+                if($u->id==$userId)
+                    return false;
+            }
+            
+            return $user->id == $userId;
+           
+        });
     
+        Gate::define('view-movements', function($user, $account) {
+            
+            $accountOwner = Account::findOrFail($account)->user;
+          
+            $associateds = $user->associated_of;
+            foreach ($associateds as $u) {
+                if($u->id==$accountOwner->id)
+                    return true;
+            }
+            return $user->id == $accountOwner->id;
+        });
+
+        
     }
 }

@@ -34,10 +34,17 @@ class MovementController extends Controller
     {
         $account = Account::findOrFail($id);
         $accountOwner = $account->user;
-        if (Auth::user()->id != $accountOwner->id) {
-            $pagetitle = "Unauthorized";
-            return Response::make(view('errors.403', compact('pagetitle')), 403);
+        
+        if(Gate::denies('view-movements', $id))
+        {
+          $pagetitle = "Unauthorized";
+          return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
+
+        //if (Auth::user()->id != $accountOwner->id) {
+        //    $pagetitle = "Unauthorized";
+        //    return Response::make(view('errors.403', compact('pagetitle')), 403);
+        //}
 
         $movements = $account->movements->sortByDesc('date');
         $movementCategories = MovementCategories::all();
