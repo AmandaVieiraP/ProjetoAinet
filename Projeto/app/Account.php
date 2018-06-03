@@ -25,7 +25,11 @@ class Account extends Model
     }
 
     public function movementsOrderByDateDesc() {
-        return $this->hasMany('App\Movement')->orderBy('date');
+        return $this->hasMany('App\Movement')->orderBy('date', 'desc');
+    }
+
+    public function movementsOrderByDateAsc() {
+        return $this->hasMany('App\Movement')->orderBy('date', 'asc');
     }
 
     public function accountType() {

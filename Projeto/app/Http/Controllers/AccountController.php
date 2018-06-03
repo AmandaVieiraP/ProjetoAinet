@@ -11,9 +11,7 @@ use App\AccountType;
 use App\Account;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
-use App\Movement;
-use \App\Http\Requests\StoreAccount;
-use Illuminate\Support\Facades\Gate;
+
 
 class AccountController extends Controller
 {
@@ -146,25 +144,23 @@ class AccountController extends Controller
         if ($request->has('cancel')) {
             return redirect()->route('home');
         }
-        
         $account = Account::findOrFail($id);
-
         if (!Auth::user()->can('edit-account', $id)) {
             $pagetitle = "Unauthorized";
             return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
-          //$validatedData=  $request->validated();;
-          $validatedData=$request->validate([
+
+        $validatedData=$request->validate([
             'code'=> ['required', Rule::unique('accounts')->where(function ($query){
                return $query->where('owner_id', Auth::id());
             })],
             'account_type_id'=>['required', 'exists:account_types,id',Rule::unique('accounts')->where(function ($query){
                return $query->where('owner_id', Auth::id());
             })],
-            'start_balance' => 'required|numeric',
+            'start_balance' => 'required|numeric|min:0',
             'description'=>'nullable|string',
             'date'=>'required|date',
-        ],[
+        ], [ 
             'account_type_id.required' => 'The account type can not be empty',
             'account_type_id.exists' => 'The type choosen is not valid',
             'code.required' => 'The code can not be empty',
@@ -173,33 +169,9 @@ class AccountController extends Controller
             'start_balance.required'=> 'The start balance value can not be empty',       
         ]);
 
-        $old_bal = $account->start_balance;
         $account->fill($validatedData);
-
-      if($old_bal != $account->start_balance){
-          $movements=Movement::where('account_id', '=', $account->id)->orderBy('date')->get();
-          if(count($movements)==0){
-            $account->current_balance = $validatedData['start_balance'];  
-          }
-          else{ 
-            $ultimo=$account->start_balance;
-            foreach ($movements as $mov) {
-              $mov->start_balance = $ultimo;
-              if(strcmp($mov->type,"expense") ==0){
-                $mov->end_balance= round($mov->start_balance - $mov->value,2);
-              }else{
-                $mov->end_balance= round($mov->start_balance + $mov->value,2);  
-              }
-              $ultimo = round($mov->end_balance,2);
-              $mov->update();
-            }
-              $account->current_balance = round($ultimo,2);
-          }
-
-        }  
-
         $account->update();
-        return redirect()->route('home')->with('success', 'Your account has been updated');
+        return redirect()->route('accounts',Auth::user()->id)->with('successMsg', 'Your account has been updated');
     }
 
     /**
@@ -230,15 +202,12 @@ class AccountController extends Controller
     }
 
 
-    public function showAccounts($userId){
-        $user = User::findOrFail($userId);
-        //dd($userId);
-        if(Gate::denies('view-accounts', $userId))
-        {
-          $pagetitle = "Unauthorized";
-          return Response::make(view('errors.403', compact('pagetitle')), 403);
+    public function showAccounts($user){
+        $user = User::findOrFail($user);
+        if(Auth::user()->id != $user->id) {
+            $pagetitle = "Unauthorized";
+            return Response::make(view('errors.403', compact('pagetitle')), 403); 
         }
-    
         $accounts = $user->allAccounts;
         $accounts_type = AccountType::all();
 

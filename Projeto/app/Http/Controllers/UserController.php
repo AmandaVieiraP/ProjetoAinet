@@ -12,8 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\UploadedFile;
 use Validator;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\DB;
+
 class UserController extends Controller
 {
     public function __construct(){
@@ -427,27 +426,9 @@ public function updateMyProfile(Request $request){
 
     }
     public function destroyAssociate($id){
-        $pagetitle= '404';
-        $user= User::findOrFail($id);
-      
-        if(Gate::allows('admin', Auth::user()->id)){
-            DB::table('associate_members')->where('associated_user_id', $user->id)->delete();
-        }else{
-            $association = DB::table('associate_members')->where('associated_user_id', $id)->get();
-            if(!isset($association['0'])){
-                $pagetitle= '404';
-                return Response::make(view('errors.notfound', compact('pagetitle')), 404);
-            }
-            DB::table('associate_members')->where('associated_user_id', $id)->delete();     
-        } 
-        return redirect()->route('users.associates')->with('success', 'Associated deleted');
+
     }
     public function showSummary(){
-        
-    }
-    public function getFinancialInfo($id)
-    {
-        $user = User::findOrFail($id);
         
     }
 }

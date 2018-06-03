@@ -17,6 +17,7 @@ use App\MovementCategories;
 use Illuminate\Http\UploadedFile;
 use Validator;
 use App\Rules\DocumentDescriptionWithoutDocument;
+use Debugbar;
 
 
 class MovementController extends Controller
@@ -34,19 +35,12 @@ class MovementController extends Controller
     {
         $account = Account::findOrFail($id);
         $accountOwner = $account->user;
-        
-        if(Gate::denies('view-movements', $id))
-        {
-          $pagetitle = "Unauthorized";
-          return Response::make(view('errors.403', compact('pagetitle')), 403);
+        if (Auth::user()->id != $accountOwner->id) {
+            $pagetitle = "Unauthorized";
+            return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
 
-        //if (Auth::user()->id != $accountOwner->id) {
-        //    $pagetitle = "Unauthorized";
-        //    return Response::make(view('errors.403', compact('pagetitle')), 403);
-        //}
-
-        $movements = $account->movements->sortByDesc('date');
+        $movements = $account->movements()->orderBy('date', 'desc')->orderBy('created_at', 'desc')->get();
         $movementCategories = MovementCategories::all();
 
         $pagetitle = "Movements";
@@ -66,8 +60,6 @@ class MovementController extends Controller
             $pagetitle = "Unauthorized";
             return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
-
-
 
         if (!is_null($account->deleted_at)) {
             return redirect()->route('movements.index', $account->id)->with('errorMsg', "You can't add a new movement to a closed account");  
@@ -111,13 +103,27 @@ class MovementController extends Controller
             }
         }
 
-        if ($type == 'expense') {
-            $endBalance = $account->current_balance - $validatedData['value'];
+        $previous = $account->movements()
+            ->where('date', '<=', $validatedData['date'])
+            ->orderBy('date', 'desc')
+            ->orderBy('created_at', 'desc')    
+            ->take(1)
+            ->first();
+
+
+
+        if (is_null($previous)) {
+            $start_balance = $account->start_balance;
         } else {
-            $endBalance = $account->current_balance + $validatedData['value'];
+            $start_balance = $previous->end_balance;
         }
 
-       // DB::beginTransaction();
+        if ($type == 'expense') {
+            $endBalance = $start_balance - $validatedData['value'];
+        } else {
+            $endBalance = $start_balance + $validatedData['value'];
+        }
+
         try {
             DB::beginTransaction();
             if ($request->hasFile('document_file')) {
@@ -134,8 +140,7 @@ class MovementController extends Controller
                     'date' => $validatedData['date'],
                     'value' => $validatedData['value'],
                     'description' => $validatedData['description'],
-                    'start_balance' => $account->current_balance,
-   // CORRIGIR CASO SEJA DESPESA OU NÃO                 
+                    'start_balance' => $start_balance,                
                     'end_balance' => $endBalance,
                     'type' => $type,
                     'document_id' => $document->id,
@@ -155,28 +160,107 @@ class MovementController extends Controller
                     'date' => $validatedData['date'],
                     'value' => $validatedData['value'],
                     'description' => $validatedData['description'],
-                    'start_balance' => $account->current_balance,
-   // CORRIGIR CASO SEJA DESPESA OU NÃO                 
+                    'start_balance' => $start_balance,               
                     'end_balance' => $endBalance,
                     'type' => $type,
                     'document_id' => null,
                 ]);
             }
+
+           // dd($movement);
         
             
             $success = true;
-           // return redirect()->route('movement.index', $account->id)->with('successMsg', "Movement add successufly"); 
         } catch (\Exception $ex) {
             if ($request->hasFile('document_file')) {
                 Storage::delete($path);
             }        
             DB::rollback();
-            $success = false;
-            //return redirect()->route('movement.index', $account->id)->with('errorMsg', "Couldn't add movement!"); 
+            $success = false; 
         }  
 
         if ($success) {
             DB::commit();
+
+            //$movementsToUpdate = $account->movements()->where('id', '!=', $movement->id)->where('date', '>=', $movement->date)->where('created_at', '>', $movement->created_at)->orderBy('date')->orderBy('created_at')->get();
+         /*   $movementsToUpdate = $account->movements()->where('date', '>', $movement->date)->orWhere('date', '==', $movement->date)->where('created_at', '>', $movement->created_at)->orderBy('date')->orderBy('created_at')->get(); */
+
+
+         /*$movs = $account->movements; 
+         $date = $movement->date;
+         $created_at = $movement->created_at;
+         $id = $account->id; */
+        /* $movementsToUpdate = $movs->where('date', '>', $movement->date)->orWhere(function($query) use ($date, $created_at) {
+           $query->where('value', '>=', 10); //->where('created_at', '>', $created_at);
+         })->get(); */
+
+         /*$movementsToUpdate = DB::table('movements')->where('account_id', '==', $account->id)->where('date', '>', $movement->date)->orWhere(function($query) use ($date, $created_at, $id) {
+           $query->where('account_id', '==', $id)->where('date', '==', $date)->where('created_at', '>', $created_at);
+         })->get(); */
+/*
+         $movs = $account->movements;
+         $moves = $movs->where('date', '>=', $movement->date);
+        
+         $moves1 = $movs->where('date', '==', $date)->where('created_at', '<=', $created_at);
+
+
+         //$movementsToUpdate = $moves->concat($moves1);
+         $movementsToUpdate = $moves->diff($moves1);
+
+        >where('name', '=', 'John')
+            ->orWhere(function ($query) {
+                $query->where('votes', '>', 100)
+                      ->where('title', '<>', 'Admin');
+            })
+            ->get(); */
+
+
+            $movs = $account->movements()->where('id', '!=', $movement->id)->where('date', '>=', $movement->date)->orderBy('date')->orderBy('created_at')->get();
+            $movementsToUpdate = array();
+            foreach($movs as $m) {
+                if ($m->date > $movement->date) {
+                    $movementsToUpdate[] = $m;
+                } else if ($m->date == $movement->date && $m->created_at > $movement->created_at) {
+                    $movementsToUpdate[] = $m;
+                }
+            }  
+
+     /*      $movementsToUpdate = $account->movements()
+                ->where('id', '!=', $movement->id)    
+                ->where('date', '>=', $movement->date)
+                ->orderBy('date', 'asc')
+                ->orderBy('created_at', 'asc')->get();
+*/
+
+            if (count($movementsToUpdate) == 0) {
+                // não existe nenhum com data superior
+                $account->last_movement_date = $movement->date;
+            } else {
+                if ($movement->type == 'expense') {
+                    foreach($movementsToUpdate as $m) {
+                        $m->start_balance = $m->start_balance - $movement->value;
+                        $m->end_balance = $m->end_balance - $movement->value;
+                        $m->save();
+                    }
+                } else {
+                    foreach($movementsToUpdate as $m) {
+                        $m->start_balance = $m->start_balance + $movement->value;
+                        $m->end_balance = $m->end_balance + $movement->value;
+                        $m->save();
+                    }
+                }
+            } 
+
+
+            if ($type == 'expense') {
+                $account->current_balance = $account->current_balance - $movement->value;
+            } else {
+                $account->current_balance = $account->current_balance + $movement->value;
+            } 
+
+
+
+            $account->save();
             return redirect()->route('movement.index', $account->id)->with('successMsg', "Movement add successufly");
         } else {
             return redirect()->route('movement.index', $account->id)->with('errorMsg', "Couldn't add movement!"); 
@@ -235,6 +319,10 @@ class MovementController extends Controller
         $account = $movement->account;
         $accountOwner = $account->user;
 
+        $original_mov_value = $movement->value;
+        $original_type = $movement->type;
+        $original_date = $movement->date;
+
         if (Gate::denies('view-account-movements', $account)) {
             $pagetitle = "Unauthorized";
             return Response::make(view('errors.403', compact('pagetitle')), 403);
@@ -253,12 +341,14 @@ class MovementController extends Controller
             }
         }
 
-        if ($type == 'expense') {
-            $endBalance = $account->current_balance - $validatedData['value'];
-        } else {
-            $endBalance = $account->current_balance + $validatedData['value'];
-        }
 
+        if ($type == 'expense') {
+            $endBalance = $movement->start_balance - $validatedData['value'];
+        } else {
+            $endBalance = $movement->start_balance + $validatedData['value'];
+        }
+      
+        
         DB::beginTransaction();
         try {
 
@@ -269,6 +359,7 @@ class MovementController extends Controller
                     'value' =>$validatedData['value'], 
                     'description' => $validatedData['description'], 
                     'type' => $type,
+                    'end_balance' => $endBalance,
                 ]);  
            
             if (is_null($movement->document_id) && $request->hasFile('document_file')) {
@@ -313,20 +404,63 @@ class MovementController extends Controller
                 // tinha associado um documento e agora quer desassociar 
 
             }
-            DB::commit();
             $success = true;
         } catch (\Exception $ex) {
             if (!is_null($movement->document_id) && !$request->hasFile('document_file')) {
                 Storage::delete($path);
             }        
             $success = false;
-            DB::rollBack();
-            //return redirect()->route('movement.index', $account->id)->with('errorMsg', "Couldn't edit movement!"); 
         } 
 
         if ($success) {
+            DB::commit();
+            $movement = Movement::findOrFail($id);
+
+
+            $movs = $account->movements()->where('id', '!=', $movement->id)->where('date', '>=', $movement->date)->orderBy('date')->orderBy('created_at')->get();
+            $movementsToUpdate = array();
+            foreach($movs as $m) {
+                if ($m->date > $movement->date) {
+                    $movementsToUpdate[] = $m;
+                } else if ($m->date == $movement->date && $m->created_at > $movement->created_at) {
+                    $movementsToUpdate[] = $m;
+                }
+            }  
+
+            if ($original_date != $movement->date && count($movementsToUpdate) == 0) {
+                $account->last_movement_date = $movement->date;
+            }
+
+            if ($original_mov_value != $movement->value || $original_type != $movement->type) {
+                if (count($movementsToUpdate) == 0) {
+                    // não existe nenhum com data superior 
+                    $account->current_balance = $movement->end_balance;
+                } else {
+                    $start_balance_update = $movement->end_balance;
+                    
+                    foreach($movementsToUpdate as $m) {
+                        if ($m->type == 'expense') {
+                            $m->start_balance = $start_balance_update;
+                            $m->end_balance = $start_balance_update - $m->value;
+                        } else {
+                            $m->start_balance = $start_balance_update;
+                            $m->end_balance = $m->start_balance + $m->value;
+                        }
+                        $m->save();
+                        $start_balance_update = $m->end_balance;
+                    }
+                    $last = end($movementsToUpdate);
+                    $account->current_balance = $last->end_balance;          
+                } 
+
+                $account->save();
+            }
+
+
+            
             return redirect()->route('movement.index', $account->id)->with('successMsg', "Movement edited successufly");
         } else {
+            DB::rollBack();
             return redirect()->route('movement.index', $account->id)->with('errorMsg', "Couldn't edit movement!");
         }
                 
@@ -342,18 +476,6 @@ class MovementController extends Controller
     {
         $movement = Movement::findOrFail($movement);
         $account = $movement->account;
-//
-
-
-
-
-// atulizar valores 
-
-
-
-
-
-//
 
         if (Gate::denies('view-account-movements', $account)) {
             $pagetitle = "Unauthorized";
@@ -368,9 +490,40 @@ class MovementController extends Controller
             Storage::delete($file);
         }
 
+        $movementsToUpdate = $account->movements()->where('id', '!=', $movement->id)->where('date', '>=', $movement->date)->get();
 
+        if ($movement->type == 'expense') {
+            $account->current_balance = $account->current_balance + $movement->value;
+            foreach($movementsToUpdate as $m) {
+                $m->start_balance = $m->start_balance + $movement->value;
+                $m->end_balance = $m->end_balance + $movement->value;
+                $m->save();
+            }
+        } else {
+            $account->current_balance = $account->current_balance - $movement->value;
+            foreach($movementsToUpdate as $m) {
+                $m->start_balance = $m->start_balance - $movement->value;
+                $m->end_balance = $m->end_balance - $movement->value;
+                $m->save();
+            }
+        }
 
+        $movements = $account->movements;
+
+        if (count($movements) == 1) {
+            $account->last_movement_date = null;
+            $account->current_balance = $account->start_balance;
+        } else if (count($movementsToUpdate) == 0) {
+            // apagou o ultimo, atualiza last_movement_date do movement
+            $m = $account->movements()->where('id', '!=', $movement->id)->where('date', '<=', $movement->date)->orderBy('date','desc')->first();
+            $account->last_movement_date = $m->date;
+        } 
+
+        $account->save();
+        
         Movement::destroy($movement->id);
+
+        
         //$movement->delete();
         return redirect()->route('movement.index', $account->id)->with('successMsg', 'Movement deleted successufly');
 
@@ -383,8 +536,8 @@ class MovementController extends Controller
             'date' => 'required|date',
             'value' => 'required|numeric|between:0.01,999999999.99',
             'description' => 'nullable', 
-            'document_file' => 'nullable|file|mimes:png,jpeg,pdf',// new DocumentDescriptionWithoutDocument($request), 
-            'document_description' => 'nullable', // new DocumentDescriptionWithoutDocument($request->hasFile('document_file'), $request['document_description']),
+            'document_file' => 'nullable|file|mimes:png,jpeg,pdf', 
+            'document_description' => 'nullable', 
         ], [
             'movement_category_id.required' => 'Movement category must be selected',
             'date.required' => 'Date must be selected', 
