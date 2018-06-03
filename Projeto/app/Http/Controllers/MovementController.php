@@ -19,10 +19,11 @@ use Validator;
 use App\Rules\DocumentDescriptionWithoutDocument;
 use Debugbar;
 
+
 class MovementController extends Controller
 {
-    public function __construct()
-    {
+
+    public function __construct(){
         $this->middleware('auth');
     }
     /**
@@ -34,28 +35,12 @@ class MovementController extends Controller
     {
         $account = Account::findOrFail($id);
         $accountOwner = $account->user;
-<<<<<<< HEAD
         if (Auth::user()->id != $accountOwner->id) {
             $pagetitle = "Unauthorized";
             return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
 
         $movements = $account->movements()->orderBy('date', 'desc')->orderBy('created_at', 'desc')->get();
-=======
-
-        if(Gate::denies('view-movements', $id))
-        {
-          $pagetitle = "Unauthorized";
-          return Response::make(view('errors.403', compact('pagetitle')), 403);
-        }
-        
-        //if (Auth::user()->id != $accountOwner->id) {
-        //    $pagetitle = "Unauthorized";
-        //    return Response::make(view('errors.403', compact('pagetitle')), 403);
-        //}
-
-        $movements = $account->movements->sortByDesc('date');
->>>>>>> 1ac3afbde4c0de38091aa0080292109c7ff0f201
         $movementCategories = MovementCategories::all();
 
         $pagetitle = "Movements";
@@ -77,7 +62,7 @@ class MovementController extends Controller
         }
 
         if (!is_null($account->deleted_at)) {
-            return redirect()->route('movements.index', $account->id)->with('errorMsg', "You can't add a new movement to a closed account");
+            return redirect()->route('movements.index', $account->id)->with('errorMsg', "You can't add a new movement to a closed account");  
         }
 
         $pagetitle = "Add new movement";
@@ -112,7 +97,7 @@ class MovementController extends Controller
  
         $movementCategories = MovementCategories::all();
 
-        foreach ($movementCategories as $m) {
+        foreach($movementCategories as $m) {
             if ($m->id == $validatedData['movement_category_id']) {
                 $type = $m->type;
             }
@@ -139,13 +124,10 @@ class MovementController extends Controller
             $endBalance = $start_balance + $validatedData['value'];
         }
 
-<<<<<<< HEAD
-=======
-        // DB::beginTransaction();
->>>>>>> 1ac3afbde4c0de38091aa0080292109c7ff0f201
         try {
             DB::beginTransaction();
             if ($request->hasFile('document_file')) {
+
                 $document = Document::create([
                     'type' => $request->file('document_file')->getClientOriginalExtension(),
                     'original_name' => $request->file('document_file')->getClientOriginalName(),
@@ -158,12 +140,7 @@ class MovementController extends Controller
                     'date' => $validatedData['date'],
                     'value' => $validatedData['value'],
                     'description' => $validatedData['description'],
-<<<<<<< HEAD
                     'start_balance' => $start_balance,                
-=======
-                    'start_balance' => $account->current_balance,
-   // CORRIGIR CASO SEJA DESPESA OU NÃO
->>>>>>> 1ac3afbde4c0de38091aa0080292109c7ff0f201
                     'end_balance' => $endBalance,
                     'type' => $type,
                     'document_id' => $document->id,
@@ -175,7 +152,7 @@ class MovementController extends Controller
                 }*/
 
                 //$path = $request->file('document_file')->storeAs('documents/'.$accountOwner->id, $movement->id.'.'.$document->type, 'local');
-                $path = Storage::putFileAs('documents/'.$account->id.'/', $request->file('document_file'), $movement->id.'.'.$document->type);
+                $path = Storage::putFileAs('documents/'.$account->id.'/', $request->file('document_file'), $movement->id.'.'.$document->type); 
             } else {
                 $movement = Movement::create([
                     'movement_category_id' => $validatedData['movement_category_id'],
@@ -183,12 +160,7 @@ class MovementController extends Controller
                     'date' => $validatedData['date'],
                     'value' => $validatedData['value'],
                     'description' => $validatedData['description'],
-<<<<<<< HEAD
                     'start_balance' => $start_balance,               
-=======
-                    'start_balance' => $account->current_balance,
-   // CORRIGIR CASO SEJA DESPESA OU NÃO
->>>>>>> 1ac3afbde4c0de38091aa0080292109c7ff0f201
                     'end_balance' => $endBalance,
                     'type' => $type,
                     'document_id' => null,
@@ -199,23 +171,13 @@ class MovementController extends Controller
         
             
             $success = true;
-<<<<<<< HEAD
-=======
-            // return redirect()->route('movement.index', $account->id)->with('successMsg', "Movement add successufly");
->>>>>>> 1ac3afbde4c0de38091aa0080292109c7ff0f201
         } catch (\Exception $ex) {
             if ($request->hasFile('document_file')) {
                 Storage::delete($path);
-            }
+            }        
             DB::rollback();
-<<<<<<< HEAD
             $success = false; 
         }  
-=======
-            $success = false;
-            //return redirect()->route('movement.index', $account->id)->with('errorMsg', "Couldn't add movement!");
-        }
->>>>>>> 1ac3afbde4c0de38091aa0080292109c7ff0f201
 
         if ($success) {
             DB::commit();
@@ -301,8 +263,9 @@ class MovementController extends Controller
             $account->save();
             return redirect()->route('movement.index', $account->id)->with('successMsg', "Movement add successufly");
         } else {
-            return redirect()->route('movement.index', $account->id)->with('errorMsg', "Couldn't add movement!");
-        }
+            return redirect()->route('movement.index', $account->id)->with('errorMsg', "Couldn't add movement!"); 
+        }     
+
     }
 
     /**
@@ -372,7 +335,7 @@ class MovementController extends Controller
         $validatedData = $this->validateData($request, $account->id);
 
         $movementCategories = MovementCategories::all();
-        foreach ($movementCategories as $m) {
+        foreach($movementCategories as $m) {
             if ($m->id == $validatedData['movement_category_id']) {
                 $type = $m->type;
             }
@@ -393,15 +356,11 @@ class MovementController extends Controller
             DB::table('movements')->where('id', '=', $movement->id)->update([
                     'movement_category_id' => $validatedData['movement_category_id'],
                     'date' => $validatedData['date'],
-                    'value' =>$validatedData['value'],
-                    'description' => $validatedData['description'],
+                    'value' =>$validatedData['value'], 
+                    'description' => $validatedData['description'], 
                     'type' => $type,
-<<<<<<< HEAD
                     'end_balance' => $endBalance,
                 ]);  
-=======
-                ]);
->>>>>>> 1ac3afbde4c0de38091aa0080292109c7ff0f201
            
             if (is_null($movement->document_id) && $request->hasFile('document_file')) {
                 // não tinha um documento associado mas agora quer associar
@@ -416,14 +375,14 @@ class MovementController extends Controller
                     'document_id' => $document->id,
                 ]);
 
-                if (!File::exists('documents/'.$accountOwner->id)) {
-                    // verifica se existe o diretorio
+                if(!File::exists('documents/'.$accountOwner->id)) {
+                        // verifica se existe o diretorio
                     Storage::makeDirectory('documents/'.$accountOwner->id);
                 }
 
-                $path = Storage::putFileAs('documents/'.$account->id, $request->file('document_file'), $movement->id.'.'.$document->type);
-            } elseif (!is_null($movement->document_id) && $request->hasFile('document_file')) {
-                // tinha associado um documento e agora quer associar outro
+                $path = Storage::putFileAs('documents/'.$account->id, $request->file('document_file'), $movement->id.'.'.$document->type); 
+            } else if (!is_null($movement->document_id) && $request->hasFile('document_file')) {
+                // tinha associado um documento e agora quer associar outro 
                 $document = Document::findOrFail($movement->document_id);
 
                 $file = 'documents/'.$account->id.'/'.$movement->id.'.'.$document->type;
@@ -434,29 +393,24 @@ class MovementController extends Controller
                     'type' => $request->file('document_file')->getClientOriginalExtension(),
                     'original_name' => $request->file('document_file')->getClientOriginalName(),
                     'description' => $request['document_description'],
-                ]);
+                ]); 
 
                 $document = DB::table('documents')->where('id', $document->id)->first();
 
-                $path = Storage::putFileAs('documents/'.$account->id, $request->file('document_file'), $movement->id.'.'.$document->type);
+                $path = Storage::putFileAs('documents/'.$account->id, $request->file('document_file'), $movement->id.'.'.$document->type);   
             }
 
             if (!is_null($movement->document_id) && !$request->hasFile('document_file')) {
-                // tinha associado um documento e agora quer desassociar
+                // tinha associado um documento e agora quer desassociar 
+
             }
             $success = true;
         } catch (\Exception $ex) {
             if (!is_null($movement->document_id) && !$request->hasFile('document_file')) {
                 Storage::delete($path);
-            }
+            }        
             $success = false;
-<<<<<<< HEAD
         } 
-=======
-            DB::rollBack();
-            //return redirect()->route('movement.index', $account->id)->with('errorMsg', "Couldn't edit movement!");
-        }
->>>>>>> 1ac3afbde4c0de38091aa0080292109c7ff0f201
 
         if ($success) {
             DB::commit();
@@ -509,6 +463,7 @@ class MovementController extends Controller
             DB::rollBack();
             return redirect()->route('movement.index', $account->id)->with('errorMsg', "Couldn't edit movement!");
         }
+                
     }
 
     /**
@@ -521,21 +476,6 @@ class MovementController extends Controller
     {
         $movement = Movement::findOrFail($movement);
         $account = $movement->account;
-<<<<<<< HEAD
-=======
-//
-
-
-
-
-        // atulizar valores
-
-
-
-
-
-//
->>>>>>> 1ac3afbde4c0de38091aa0080292109c7ff0f201
 
         if (Gate::denies('view-account-movements', $account)) {
             $pagetitle = "Unauthorized";
@@ -586,26 +526,21 @@ class MovementController extends Controller
         
         //$movement->delete();
         return redirect()->route('movement.index', $account->id)->with('successMsg', 'Movement deleted successufly');
+
     }
 
-    private function validateData(Request $request, $accountId)
-    {
+    private function validateData(Request $request, $accountId) {
+
         $validatedData = $request->validate([
             'movement_category_id' => 'required|exists:movement_categories,id',
             'date' => 'required|date',
             'value' => 'required|numeric|between:0.01,999999999.99',
-<<<<<<< HEAD
             'description' => 'nullable', 
             'document_file' => 'nullable|file|mimes:png,jpeg,pdf', 
             'document_description' => 'nullable', 
-=======
-            'description' => 'nullable',
-            'document_file' => 'nullable|file|mimes:png,jpeg,pdf',// new DocumentDescriptionWithoutDocument($request),
-            'document_description' => 'nullable', // new DocumentDescriptionWithoutDocument($request->hasFile('document_file'), $request['document_description']),
->>>>>>> 1ac3afbde4c0de38091aa0080292109c7ff0f201
         ], [
             'movement_category_id.required' => 'Movement category must be selected',
-            'date.required' => 'Date must be selected',
+            'date.required' => 'Date must be selected', 
             'value.required' => 'Value must not be empty',
             'value.regex' => 'Value must be a positive number in the format: dd.dd',
             'document_file.mimes' => 'Document must be in one of the following formats: .png, .jpeg, .pdf',
@@ -617,16 +552,17 @@ class MovementController extends Controller
 
         if (!array_key_exists('document_description', $validatedData)) {
             $validatedData['document_description'] = null;
-        }
+        } 
 
         if (!$request->hasFile('document_file') && !is_null($validatedData['document_description'])) {
-            return redirect()->route('movement.create', $accountId)->withErrors(['document_file' => 'Have document description but missing document file']);
+            return redirect()->route('movement.create', $accountId)->withErrors(['document_file' => 'Have document description but missing document file']); 
         }
 
         if ($request->hasFile('document_file') && ($request->file('document_file')->getClientOriginalExtension() == 'jpg' || $request->file('document_file')->getClientOriginalExtension() == 'jpe')) {
-            return redirect()->route('movement.create', $account->id)->with('errorMsg', "Document can't be a .jpg or .jpe");
+            return redirect()->route('movement.create', $account->id)->with('errorMsg', "Document can't be a .jpg or .jpe"); 
         }
 
         return $validatedData;
     }
+
 }

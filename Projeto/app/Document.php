@@ -12,9 +12,8 @@ class Document extends Model
 
     public $timestamps  = false;
 
-    public function movement()
-    {
-        return $this->belongsTo('App\Movement', 'document_id');
+    public function movement() {
+        return $this->belongsTo('App\Movement','document_id');
     }
 
     public static function boot()

@@ -29,45 +29,39 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
-    public function associated_of()
-    {
+    public function associated_of() {
         return $this->belongsToMany(User::class, 'associate_members', 'associated_user_id', 'main_user_id')->withPivot('created_at');
     }
     
-    public function associateds()
-    {
+    public function associateds() {
         return $this->belongsToMany(User::class, 'associate_members', 'main_user_id', 'associated_user_id')->withPivot('created_at');
     }
 
-    public function allAccounts()
-    {
+    public function allAccounts() {
         return $this->hasMany('App\Account', 'owner_id')->withTrashed();
     }
 
-    public function closedAccounts()
-    {
+    public function closedAccounts() {
         return $this->hasMany('App\Account', 'owner_id')->onlyTrashed();
     }
 
-    public function openAccounts()
-    {
+    public function openAccounts(){
         return $this->hasMany('App\Account', 'owner_id');
     }
 
-    public function movements()
-    {
+    public function movements() {
         return $this->hasMany('App\Movement');
     }
 
     public function isOwner($account_id)
     {
         $useraccounts = $this->allAccounts;
-        foreach ($useraccounts as $acc) {
-            if ($acc->id == $account_id) {
+          foreach ($useraccounts as $acc) {
+              if($acc->id == $account_id){
                 return true;
-            }
-        }
+              }
+          }
          
-        return false;
+            return false;
     }
 }

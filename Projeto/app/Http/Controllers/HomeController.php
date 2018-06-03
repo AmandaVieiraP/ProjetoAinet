@@ -24,6 +24,6 @@ class HomeController extends Controller
     public function index()
     {
         $pagetitle="My Profile";
-        return view('home', compact('pagetitle'));
+        return view('home',compact('pagetitle'));
     }
 }
