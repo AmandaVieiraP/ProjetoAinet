@@ -15,7 +15,8 @@ use Illuminate\Support\Facades\File;
 
 class DocumentController extends Controller
 {
-    public function __construct(){
+    public function __construct()
+    {
         $this->middleware('auth');
     }
 
@@ -39,7 +40,7 @@ class DocumentController extends Controller
         $movement=Movement::findOrFail($id);
         $pagetitle="Upload Document";
 
-        return view('movements.documents.uploadDocument', compact('movement','pagetitle'));
+        return view('movements.documents.uploadDocument', compact('movement', 'pagetitle'));
     }
 
     /**
@@ -59,24 +60,36 @@ class DocumentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
         $document=Document::findOrFail($id);
 
-     //   if(Gate::denies('associates-view-documents', $id))
-     //   {
-     //     $pagetitle = "Unauthorized";
-     //     return Response::make(view('errors.403', compact('pagetitle')), 403);
-     //   }
+        $movement=Movement::where('document_id', $id)->first();
 
-        $movement=Movement::where('document_id',$id)->first();
-
-        if(Gate::forUser(Auth::user())->denies('download-document',$id)){
+        if (Gate::forUser(Auth::user())->denies('download-document', $id)) {
             $pagetitle = "Unauthorized";
-            return Response::make(view('errors.403', compact('pagetitle')), 403); 
+            return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
 
-        return Storage::download('documents/'.$movement->account_id.'/'.$movement->id.'.'.$document->type, $document->original_name,[]);
+        if($request->has('view')){
+            $this->showInBrowser($id);
+        }
+
+        return Storage::download('documents/'.$movement->account_id.'/'.$movement->id.'.'.$document->type, $document->original_name, []);
+    }
+
+    public function showInBrowser($id)
+    {
+        $document=Document::findOrFail($id);
+
+        $movement=Movement::where('document_id', $id)->first();
+
+        if (Gate::forUser(Auth::user())->denies('download-document', $id)) {
+            $pagetitle = "Unauthorized";
+            return Response::make(view('errors.403', compact('pagetitle')), 403);
+        }
+
+        return response()->file('documents/'.$movement->account_id.'/'.$movement->id.'.'.$document->type);
     }
 
     /**
@@ -107,14 +120,15 @@ class DocumentController extends Controller
             return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
 
-        if($request->has('cancel'))
-            return redirect()->route('movement.index',['account' => $account->id]);
+        if ($request->has('cancel')) {
+            return redirect()->route('movement.index', ['account' => $account->id]);
+        }
 
         $validatedData=$request->validate([
             'document_description'=>'nullable',
             'document_file'=>'required|mimes:png,jpeg,pdf'
 
-        ], [ 
+        ], [
             'document_file.required'=>'The document must have a file associated',
             'document_file.mimes' =>'The document must be a file pdf, png, jpeg.',
         ]);
@@ -125,23 +139,21 @@ class DocumentController extends Controller
         $documentArray['description']=$request->input('document_description');
 
         $mimes=['.png','.jpeg','.pdf'];
-        if(in_array($documentArray['type'],$mimes)){
-            return redirect()->route('movement.index',['account' => $account->id])->withErrors(['type' => 'The type must be jpeg, png, pdf']);
+        if (in_array($documentArray['type'], $mimes)) {
+            return redirect()->route('movement.index', ['account' => $account->id])->withErrors(['type' => 'The type must be jpeg, png, pdf']);
         }
 
-        if($movement->document_id==null){
+        if ($movement->document_id==null) {
             $document=Document::create($documentArray);
             $movement->document()->associate($document);
             $movement->save();
-        }
-        else{
-
+        } else {
             $doc_id=$movement->document_id;
             $document=Document::findOrFail($doc_id);
 
             Storage::delete('documents/'.$account->id.'/'.$movement->id.'.'.$document->type);
 
-            Document::where('id',$doc_id)->update(
+            Document::where('id', $doc_id)->update(
                 array(
                  'type' => $documentArray['type'],
                  'original_name' => $documentArray['original_name'],
@@ -151,9 +163,10 @@ class DocumentController extends Controller
         }
         
         //armazenar o documento na Strorage
-        Storage::putFileAs('documents/'.$account->id.'/', $request->file('document_file'),$movement->id.'.'.$documentArray['type']);
+        Storage::putFileAs('documents/'.$account->id.'/', $request->file('document_file'), $movement->id.'.'.$documentArray['type']);
         
-        return redirect()->route('movement.index',['account' => $account->id])->with('successMsg','Your document has been uploaded');;
+        return redirect()->route('movement.index', ['account' => $account->id])->with('successMsg', 'Your document has been uploaded');
+        ;
     }
 
     /**
@@ -166,7 +179,7 @@ class DocumentController extends Controller
     {
         $document=Document::findOrFail($id);
 
-        $movement=Movement::where('document_id',$id)->first();
+        $movement=Movement::where('document_id', $id)->first();
 
         $account=Account::findOrFail($movement->account_id);
 
@@ -175,7 +188,7 @@ class DocumentController extends Controller
             return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
 
-        Movement::where('document_id',$id)->update(
+        Movement::where('document_id', $id)->update(
                 array(
                  'document_id'=>null,
               )
@@ -185,6 +198,6 @@ class DocumentController extends Controller
 
         Storage::delete('documents/'.$movement->account_id.'/'.$movement->id.'.'.$document->type);
 
-        return redirect()->route('movement.index',['account' => $movement->account_id])->with('successMsg','Your document has been deleted');
+        return redirect()->route('movement.index', ['account' => $movement->account_id])->with('successMsg', 'Your document has been deleted');
     }
 }

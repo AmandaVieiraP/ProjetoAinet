@@ -1,6 +1,27 @@
 @extends('master')
 @section('content')
 
+@if ($errors->any())
+    @alert(['type' => 'danger','title'=>'Errors'])
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    @endalert
+@endif
+
+@if(Session::has('successMsg'))
+    @alert(['type' => 'success','title'=>'Success!'])
+        {{session('successMsg')}}
+    @endalert
+@endif
+
+@include('users.partials.menuProfile')
+
+<p>
+<a href="{{ route('get.createAssociate') }}" class="btn btn-secondary">Add New Associate</a>
+</p>
 
 @if (count($users))
 <table class="table table-striped">
@@ -11,7 +32,6 @@
             <th>Email</th>
             <th>Phone</th>
             <th>Actions</th>
-
         </tr>
     </thead>
     <tbody>
@@ -20,11 +40,11 @@
         	<td>
         		@if (auth()->user()->profile_photo)
                     <div class="float-left">
-        			     <img src="{{ asset('storage/profiles/' . $user->profile_photo) }}" alt="Foto Perfil" width="50" height="60">
+        			     <img src="{{ asset('storage/profiles/'.$user->profile_photo) }}" alt="Foto Perfil" width="50" height="60" class="img-round">
                     </div>
 			    @else
-                    <div class="float-left">
-			             <img src="{{ asset('storage/profiles/avatar.jpg') }}" alt="Foto Perfil" width="50" height="60">
+                    <div class="float_left">
+                        <img src="{{ asset('storage/profiles/avatar.jpg') }}" width="50" height="60" alt="Foto Perfil" class="img-round">
                     </div>
 			    @endif
         	</td>

@@ -12,19 +12,19 @@
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav">
       <li>
-        <a class="nav-link" href="{{ route('dashboard',['user'=>$user->id]) }}">Dashboard</a>
+        <a class="nav-link" href="{{ route('dashboard',['user'=>$user->id]) }}"><strong>Dashboard</strong></a>
       </li>
       <li>
-        <a class="nav-link" href="{{ route('accounts',['user'=>$user->id]) }}">All Accounts</a>
+        <a class="nav-link" href="{{ route('accounts',['user'=>$user->id]) }}"><strong>All Accounts</strong></a>
       </li>
       <li>
-        <a class="nav-link" href="{{ route('accounts.closed',['user'=>$user->id]) }}">Only Closed Accounts</a>
+        <a class="nav-link" href="{{ route('accounts.closed',['user'=>$user->id]) }}"><strong>Only Closed Accounts</strong></a>
       </li>
       <li>
-        <a class="nav-link" href="{{ route('accounts.opened',['user'=>$user->id]) }}">Open Accounts</a>
+        <a class="nav-link" href="{{ route('accounts.opened',['user'=>$user->id]) }}"><strong>Open Accounts</strong></a>
       </li>
       <li>
-        <a class="nav-link" href="{{ route('account.create') }}">Add New Account</a>
+        <a class="nav-link" href="{{ route('account.create') }}"><strong>Add New Account</strong></a>
       </li>
     </ul>
   </div>

@@ -26,5 +26,7 @@ Unauthorized Access!
 	</thread>
 </table>
 
+@include('initialCharts', ['users' => count($users), 'accounts' => count($accounts), 'movements' =>count($movements)])
+
 @endsection
 

@@ -7,21 +7,23 @@ use App\Account;
 
 class Movement extends Model
 {
-	protected $casts = [
-    	'value' => 'float',
-	];
+    protected $casts = [
+        'value' => 'float',
+    ];
 
     public $timestamps  = false;
 
-	protected $fillable = [
+    protected $fillable = [
          'account_id', 'movement_category_id', 'date', 'value', 'start_balance', 'end_balance', 'description', 'type', 'document_id'
     ];
 
-    public function account() {
+    public function account()
+    {
         return $this->belongsTo('App\Account');
     }
 
-    public function document() {
+    public function document()
+    {
         return $this->belongsTo('App\Document');
     }
 
@@ -34,5 +36,4 @@ class Movement extends Model
             $model->created_at = $model->freshTimestamp();
         });
     }
-
 }

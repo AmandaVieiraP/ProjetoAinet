@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Storage;
 
-
 class RegisterController extends Controller
 {
     /*
@@ -50,7 +49,6 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
-        
         return Validator::make($data, [
             'name' => 'required|string|max:255|regex:/^[A-Za-z\s-]+$/',
             'email' => 'required|string|email|max:255|unique:users',
@@ -68,12 +66,10 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-
-
-        if(isset($data['profile_photo'])){
-           $imagem= $data['profile_photo'];
-           $nome = basename($imagem->store('profiles', 'public'));
-        }else{
+        if (isset($data['profile_photo'])) {
+            $imagem= $data['profile_photo'];
+            $nome = basename($imagem->store('profiles', 'public'));
+        } else {
             $nome= null;
         }
 
@@ -83,11 +79,12 @@ class RegisterController extends Controller
             'password' => Hash::make($data['password']),
             'phone' => $data['phone'] ?? null,
             'profile_photo' => $nome,
-        ]);        
+        ]);
     }
 
-    protected function showRegistrationForm(){
+    protected function showRegistrationForm()
+    {
         $pagetitle="Register";
-        return view('auth.register',compact('pagetitle'));
+        return view('auth.register', compact('pagetitle'));
     }
 }

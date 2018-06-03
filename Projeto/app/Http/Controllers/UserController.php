@@ -13,10 +13,13 @@ use Illuminate\Validation\Rule;
 use Illuminate\Http\UploadedFile;
 use Validator;
 use Illuminate\Support\Facades\Gate;
+use App\AssociateMember;
 use Illuminate\Support\Facades\DB;
+
 class UserController extends Controller
 {
-    public function __construct(){
+    public function __construct()
+    {
         $this->middleware('auth');
     }
     /**
@@ -58,31 +61,47 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        if (Auth::user()->id!=$id) {
+        $user=User::findOrFail($id);
+
+        if (Gate::denies('view-accounts', $id)) {
             $pagetitle = "Unauthorized";
             return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
 
+        //if (Auth::user()->id!=$user->id) {
+        //    $pagetitle = "Unauthorized";
+        //    return Response::make(view('errors.403', compact('pagetitle')), 403);
+        //}
+
         $pagetitle="Dashboard";
 
-        $user=User::findOrFail($id);
+        $accounts=$user->allAccounts;
 
-        $accounts=Auth::user()->openAccounts;
+        $summary=[];
 
-        $summary = $accounts->pluck('current_balance');
+        foreach ($accounts as $acc) {
+            $summary[]=$acc->current_balance;
+        }
 
-        $total = $summary->sum();
+        $total=0;
+        
+        foreach ($summary as $s) {
+            $total+=$s;
+        }
 
         $percentage=[];
 
         foreach ($accounts as $a) {
-            if($a->current_balance!=0)
-                $percentage[]=number_format(abs($a->current_balance/$total * 100),2);
-            else
+            if ($a->current_balance!=0) {
+                $percentage[]=number_format(($a->current_balance/$total * 100), 2);
+            } else {
                 $percentage[]=0;
+            }
         }
 
-        return view('accounts.dashboard', compact('pagetitle','user','accounts','summary','total', 'percentage')); 
+        $total=number_format($total, 2);
+
+        return view('accounts.dashboard', compact('pagetitle', 'user', 'accounts', 'summary', 'total', 'percentage', 'id'));
     }
 
     /**
@@ -119,119 +138,114 @@ class UserController extends Controller
         //
     }
 
-     //US5 e US6--------------------------------------------------------
-    public function listAllUsersToAdmin(Request $request) {
-
+    public function listAllUsersToAdmin(Request $request)
+    {
         $pagetitle = "List of Users";
         $users=UserController::filter($request);
 
-        return view('users.listUsersToAdmin', compact('users', 'pagetitle')); 
-        
+        return view('users.listUsersToAdmin', compact('users', 'pagetitle'));
     }
 
-    private static function filter(Request $request){
+    private static function filter(Request $request)
+    {
         //se nada estiver prenchido
-        if(!$request->filled('name') && !$request->filled('type') && !$request->filled('status')){
-           return User::all(); 
+        if (!$request->filled('name') && !$request->filled('type') && !$request->filled('status')) {
+            return User::all();
         }
 
         //se type ou status invalido
-        if(($request->filled('type') && $request->query('type')!='admin' && $request->query('type')!='normal') || ($request->filled('status') && $request->query('status')!='blocked' && $request->query('status')!='unblocked')){
-
+        if (($request->filled('type') && $request->query('type')!='admin' && $request->query('type')!='normal') || ($request->filled('status') && $request->query('status')!='blocked' && $request->query('status')!='unblocked')) {
             return User::all();
         }
 
         //só type normal
-        if(!$request->filled('name')&& $request->filled('type') && $request->query('type')=='normal' && !$request->filled('status')){
-            return User::where('admin','=',false)->get();
+        if (!$request->filled('name')&& $request->filled('type') && $request->query('type')=='normal' && !$request->filled('status')) {
+            return User::where('admin', '=', false)->get();
         }
         //só type admin
-        if(!$request->filled('name')&& $request->filled('type') && $request->query('type')=='admin' && !$request->filled('status')){
-
-            return User::where('admin','=',true)->get();
+        if (!$request->filled('name')&& $request->filled('type') && $request->query('type')=='admin' && !$request->filled('status')) {
+            return User::where('admin', '=', true)->get();
         }
 
         //só status blocked
-        if(!$request->filled('name')&& !$request->filled('type') && $request->filled('status') && $request->query('status')=='blocked'){
-            return User::where('blocked','=',true)->get();
+        if (!$request->filled('name')&& !$request->filled('type') && $request->filled('status') && $request->query('status')=='blocked') {
+            return User::where('blocked', '=', true)->get();
         }
 
         //só status unblocked
-        if(!$request->filled('name')&& !$request->filled('type') && $request->filled('status') && $request->query('status')=='unblocked'){
-            return User::where('blocked','=',false)->get();
+        if (!$request->filled('name')&& !$request->filled('type') && $request->filled('status') && $request->query('status')=='unblocked') {
+            return User::where('blocked', '=', false)->get();
         }
 
         //type+status
-        if(!$request->filled('name')&& $request->filled('type') && $request->query('type')=='normal' && $request->filled('status')){
+        if (!$request->filled('name')&& $request->filled('type') && $request->query('type')=='normal' && $request->filled('status')) {
             //'normal'+'blocked'
-            if($request->query('status')=='blocked'){
-                return User::where('admin','=',false)->where('blocked','=',true)->get();
+            if ($request->query('status')=='blocked') {
+                return User::where('admin', '=', false)->where('blocked', '=', true)->get();
             }
             //'normal'+'unblocked'
-            else{
-                return User::where('admin','=',false)->where('blocked','=',false)->get();
+            else {
+                return User::where('admin', '=', false)->where('blocked', '=', false)->get();
             }
         }
 
-        if(!$request->filled('name')&& $request->filled('type') && $request->query('type')=='admin' && $request->filled('status')){
+        if (!$request->filled('name')&& $request->filled('type') && $request->query('type')=='admin' && $request->filled('status')) {
             //'admin'+'blocked'
-            if($request->query('status')=='blocked'){
-                return User::where('admin','=',true)->where('blocked','=',true)->get();
+            if ($request->query('status')=='blocked') {
+                return User::where('admin', '=', true)->where('blocked', '=', true)->get();
             }
             //'admin'+'unblocked'
-            else{
-                return User::where('admin','=',true)->where('blocked','=',false)->get();
+            else {
+                return User::where('admin', '=', true)->where('blocked', '=', false)->get();
             }
         }
 
         //só nome
-        if($request->filled('name') && !$request->filled('type') && !$request->filled('status')){
-            return User::where('name','like','%'.$request->query('name').'%')->get();
+        if ($request->filled('name') && !$request->filled('type') && !$request->filled('status')) {
+            return User::where('name', 'like', '%'.$request->query('name').'%')->get();
         }
 
         //nome+type
-        if($request->filled('name') && $request->filled('type') && !$request->filled('status')){
+        if ($request->filled('name') && $request->filled('type') && !$request->filled('status')) {
             //'normal'
-            if($request->query('type')=='normal'){
-                return User::where('name','like','%'.$request->query('name').'%')->where('admin','=',false)->get();
-            }
-            else{
+            if ($request->query('type')=='normal') {
+                return User::where('name', 'like', '%'.$request->query('name').'%')->where('admin', '=', false)->get();
+            } else {
                 //'admin'
-                return User::where('name','like','%'.$request->query('name').'%')->where('admin','=',true)->get();
+                return User::where('name', 'like', '%'.$request->query('name').'%')->where('admin', '=', true)->get();
             }
         }
         //nome+status
-        if($request->filled('name') && !$request->filled('type') && $request->filled('status')){
+        if ($request->filled('name') && !$request->filled('type') && $request->filled('status')) {
             //blocked
-            if($request->query('status')=='blocked'){
-                return User::where('name','like','%'.$request->query('name').'%')->where('blocked','=',true)->get();
-            }
-            else{
+            if ($request->query('status')=='blocked') {
+                return User::where('name', 'like', '%'.$request->query('name').'%')->where('blocked', '=', true)->get();
+            } else {
                 //unblocked
-                return User::where('name','like','%'.$request->query('name').'%')->where('blocked','=',false)->get();
+                return User::where('name', 'like', '%'.$request->query('name').'%')->where('blocked', '=', false)->get();
             }
         }
-         //nome+type+status
-        if($request->filled('name') && $request->filled('type') && $request->filled('status')){
+        //nome+type+status
+        if ($request->filled('name') && $request->filled('type') && $request->filled('status')) {
             //'nome'+'normal'+'blocked'
-            if($request->query('type')=='normal'){
-                if($request->query('status')=='blocked'){
-                    return User::where('name','like','%'.$request->query('name').'%')->where('admin','=',false)->where('blocked','=',true)->get();
+            if ($request->query('type')=='normal') {
+                if ($request->query('status')=='blocked') {
+                    return User::where('name', 'like', '%'.$request->query('name').'%')->where('admin', '=', false)->where('blocked', '=', true)->get();
                 }
-                 //'nome'+'normal'+'unblocked'
-                else{
-                    return User::where('name','like','%'.$request->query('name').'%')->where('admin','=',false)->where('blocked','=',false)->get();
+                //'nome'+'normal'+'unblocked'
+                else {
+                    return User::where('name', 'like', '%'.$request->query('name').'%')->where('admin', '=', false)->where('blocked', '=', false)->get();
                 }
             }
             //'nome'+'admin'+'blocked'
-            else{
-                if($request->query('status')=='blocked'){
+            else {
+                if ($request->query('status')=='blocked') {
                     var_dump(5.111);
-                    return User::where('name','like','%'.$request->query('name').'%')->where('admin','=',true)->where('blocked','=',true)->get();
+                    return User::where('name', 'like', '%'.$request->query('name').'%')->where('admin', '=', true)->where('blocked', '=', true)->get();
                 }
-            //'nome'+'admin'+'unblocked'
-                else{
-                    return User::where('name','like','%'.$request->query('name').'%')->where('admin','=',true)->where('blocked','=',false)->get();
+                //'nome'+'admin'+'unblocked'
+                else {
+                    return User::where('name', 'like', '%'.$request->query('name').'%')->where('admin', '=', true)->where('blocked', '=', false)->get();
                 }
             }
         }
@@ -239,23 +253,24 @@ class UserController extends Controller
     //------------------------------------------------------------------------
 
 
-    public function blockUser(Request $request, $user) {
+    public function blockUser(Request $request, $user)
+    {
         $userToBlock = User::findOrFail($user);
         if (Auth::user()->id == $userToBlock->id) {
             $pagetitle = "Unauthorized";
             return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
         if ($userToBlock->blocked == 1) {
-            return redirect()->route('list.of.all.users')->with('errorMsg', "User is already blocked"); 
-        } 
+            return redirect()->route('list.of.all.users')->with('errorMsg', "User is already blocked");
+        }
         $userToBlock->blocked = 1;
         $userToBlock->save();
 
-        return redirect()->route('list.of.all.users')->with('successMsg', "User was blocked succesfully"); 
+        return redirect()->route('list.of.all.users')->with('successMsg', "User was blocked succesfully");
     }
 
-    public function unblockUser(Request $request, $user) {
-
+    public function unblockUser(Request $request, $user)
+    {
         $userToUnblock = User::findOrFail($user);
         
         if (Auth::user()->id == $userToUnblock->id) {
@@ -269,10 +284,11 @@ class UserController extends Controller
         $userToUnblock->save();
 
 
-        return redirect()->route('list.of.all.users')->with('successMsg', "User was unblocked succesfully"); 
+        return redirect()->route('list.of.all.users')->with('successMsg', "User was unblocked succesfully");
     }
 
-    public function promoteUser(Request $request, $user) {
+    public function promoteUser(Request $request, $user)
+    {
         $userToPromote = User::findOrFail($user);
         if (Auth::user()->id == $userToPromote->id) {
             $pagetitle = "Unauthorized";
@@ -284,10 +300,11 @@ class UserController extends Controller
         $userToPromote->admin = 1;
         $userToPromote->save();
 
-        return redirect()->route('list.of.all.users')->with('successMsg', "User was promoted succesfully"); 
+        return redirect()->route('list.of.all.users')->with('successMsg', "User was promoted succesfully");
     }
 
-    public function demoteUser(Request $request, $user) {
+    public function demoteUser(Request $request, $user)
+    {
         $userToDemote = User::findOrFail($user);
         if (Auth::user()->id == $userToDemote->id) {
             $pagetitle = "Unauthorized";
@@ -298,15 +315,17 @@ class UserController extends Controller
         };
         $userToDemote->admin = 0;
         $userToDemote->save();
-        return redirect()->route('list.of.all.users')->with('successMsg', "User was demoted succesfully"); 
+        return redirect()->route('list.of.all.users')->with('successMsg', "User was demoted succesfully");
     }
 
-     public function showChangePasswordForm(){
+    public function showChangePasswordForm()
+    {
         $pagetitle = "Change My Password";
         return view('users.changePassword', compact('pagetitle'));
     }
 
-    public function changePassword(Request $request){
+    public function changePassword(Request $request)
+    {
         if ($request->has('cancel')) {
             return redirect()->route('home');
         }
@@ -315,13 +334,13 @@ class UserController extends Controller
         //require-> campo tem de estar preenchido
         //confirmed-> existe um campo que há pelo menos outro campo igual no questionario e que é diferente de old_passwod
          
-         // A password change fails with invalid old password
-         // 
+        // A password change fails with invalid old password
+        //
         $validatedData=$request->validate([
             'old_password'=>'required',
             'password'=>'required|confirmed|min:3|different:old_password',
             'password_confirmation'=>'required|same:password',
-        ], [ 
+        ], [
         'old_password.required' => 'You must enter your current password',
         'password.required' => 'You must enter a new password',
         'password.different' => 'The new password must be different from the current password',
@@ -342,15 +361,16 @@ class UserController extends Controller
 
 
         return redirect()->route('home')->with('success', 'Your password has been updated');
-        
     }
 
-    public function showEditMyProfileForm(){
+    public function showEditMyProfileForm()
+    {
         $pagetitle = "Update My Profile";
         return view('users.editMyProfile', compact('pagetitle'));
     }
 
-public function updateMyProfile(Request $request){
+    public function updateMyProfile(Request $request)
+    {
         if ($request->has('cancel')) {
             return redirect()->route('home');
         }
@@ -360,7 +380,7 @@ public function updateMyProfile(Request $request){
             'phone'=>'nullable|regex:/(^[0-9\+ ]+$)+/',
             'email' => 'email|required|'.Rule::unique('users')->ignore(Auth::User()->id),
             'profile_photo'=>'nullable|image|mimes:png,jpeg,jpg',
-        ], [ 
+        ], [
         'name.required' => 'Name must not be empty',
         'name.regex' => 'Name must only have letters and spaces',
         'email.required' => 'The email must not be empty',
@@ -375,7 +395,7 @@ public function updateMyProfile(Request $request){
 
         $user->fill($validatedData);
 
-        if(!$request->has('phone')){
+        if (!$request->has('phone')) {
             $user->phone=null;
         }
 
@@ -388,66 +408,101 @@ public function updateMyProfile(Request $request){
 
         $user->save();
 
-        return redirect()->route('home')->with('success', 'Your update has been updated');
+        return redirect()->route('home')->with('success', 'Your profile has been updated');
     }
 
-    public function getProfile(Request $request) {
+    public function getProfile(Request $request)
+    {
         $pagetitle = "List of Users";
 
         $users = $this->filterProfilesByName($request);
         $associateds = Auth::user()->associateds;
         $associated_of = Auth::user()->associated_of;
 
-        return view('users.profiles', compact('users', 'associateds', 'associated_of', 'pagetitle')); 
+        return view('users.profiles', compact('users', 'associateds', 'associated_of', 'pagetitle'));
     }
 
-    public function filterProfilesByName(Request $request) {
+    public function filterProfilesByName(Request $request)
+    {
         $name = $request->query('name');
         if (empty($name)) {
             return User::all();
         } else {
             return User::where('name', 'like', '%'.$name.'%')->get();
         }
-
     }
 
-    public function getAssociates(){
+    public function getAssociates()
+    {
         $pagetitle = "List of Associated users";
-        $users = Auth::user()->associateds; 
+        $users = Auth::user()->associateds;
         return view('users.listofAssociateMembers', compact('users', 'pagetitle'));
     }
 
-    public function getAssociateOfMe(){
+    public function getAssociateOfMe()
+    {
         $pagetitle = "Users that I'm associated";
         $users = Auth::user()->associated_of;
-        return view('users.listofAssociateMembersOf', compact('users', 'pagetitle'));        
-
+        return view('users.listofAssociateMembersOf', compact('users', 'pagetitle'));
     }
-    public function createAssociate(){
+    public function createAssociate(Request $request)
+    {
+        if ($request->has('cancel')) {
+            return redirect()->route('users.associates');
+        }
 
+        $associateds=Auth::user()->associateds;
+        $associatedsIds=[];
+        foreach ($associateds as $a) {
+            $associatedsIds[]=$a->id;
+        }
+
+        $validatedData=$request->validate([
+            'associated_user' => 'required|exists:users,id',
+        ], [
+            'associated_user.exists'=>'You must pick a valid user',
+        ]);
+
+        if ($request->input('associated_user')==Auth::user()->id) {
+            return redirect()->route('users.associates')->withErrors(['associated_user'=>'Can not associate to yourself']);
+        }
+
+        if (in_array($request->input('associated_user'), $associatedsIds)) {
+            return redirect()->route('users.associates')->withErrors(['associated_user'=>'This user is already associated to you']);
+        }
+        
+        AssociateMember::create(['main_user_id' => Auth::user()->id, 'associated_user_id'=>$request->input('associated_user'),]);
+        
+        return redirect()->route('users.associates')->with('successMsg', 'User associated with success!');
     }
-    public function destroyAssociate($id){
+
+    public function destroyAssociate($id)
+    {
         $pagetitle= '404';
         $user= User::findOrFail($id);
       
-        if(Gate::allows('admin', Auth::user()->id)){
+        if (Gate::allows('admin', Auth::user()->id)) {
             DB::table('associate_members')->where('associated_user_id', $user->id)->delete();
-        }else{
+        } else {
             $association = DB::table('associate_members')->where('associated_user_id', $id)->get();
-            if(!isset($association['0'])){
+            if (!isset($association['0'])) {
                 $pagetitle= '404';
                 return Response::make(view('errors.notfound', compact('pagetitle')), 404);
             }
-            DB::table('associate_members')->where('associated_user_id', $id)->delete();     
-        } 
+            DB::table('associate_members')->where('associated_user_id', $id)->delete();
+        }
         return redirect()->route('users.associates')->with('success', 'Associated deleted');
     }
-    public function showSummary(){
-        
-    }
-    public function getFinancialInfo($id)
+
+    public function getCreateAssociate()
     {
-        $user = User::findOrFail($id);
-        
+        $pagetitle="Add New Associated";
+        $users = User::all();
+        $associateds=Auth::user()->associateds;
+        $associatedsIds=[];
+        foreach ($associateds as $a) {
+            $associatedsIds[]=$a->id;
+        }
+        return view('users.createAssociate', compact('users', 'pagetitle', 'associatedsIds'));
     }
 }
