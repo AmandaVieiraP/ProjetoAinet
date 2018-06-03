@@ -13,29 +13,7 @@
         @endalert
 @endif
 
-<h4 id='espaco'> <b>User: </b> {{ $user->name }} </h4>
-<nav class="navbar navbar-expand-lg navbar-light bg-light
-    ">
-
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
-          <li>
-            <a class="nav-link" href="{{ route('accounts', ['user'=>$user->id]) }}">All Accounts</a>
-          </li>
-          <li>
-            <a class="nav-link" href="{{ route('accounts.opened', ['user'=>$user->id]) }}">Only Open Accounts</a>
-          </li>
-          <li>
-            <a class="nav-link" href="{{ route('accounts.closed', ['user'=>$user->id]) }}">Only Close Accounts</a>
-          </li>
-        </ul>
-      </div>
-</nav>
-<br>
+@include('accounts.partials.mainHeader')
 
 @if (count($accounts))
     <table class="table table-striped">

@@ -1,6 +1,7 @@
 @extends('master')
 @section('content')
 
+@include('users.partials.menuProfile')
 
 @if (count($users))
 <table class="table table-striped">
@@ -20,11 +21,11 @@
                 <div class="float-left"> 
                     @if (auth()->user()->profile_photo)
                         <div class="float_left">
-                            <img src="{{ asset('storage/profiles/' . $user->profile_photo) }}" width="50" height="60" alt="Foto Perfil">
+                            <img src="{{ asset('storage/profiles/' . $user->profile_photo) }}" width="50" height="60" alt="Foto Perfil" class="img-round">
                         </div>
                     @else 
                          <div class="float_left">
-                        <img src="{{ asset('storage/profiles/avatar.jpg') }}" width="50" height="60" alt="Foto Perfil">
+                        <img src="{{ asset('storage/profiles/avatar.jpg') }}" width="50" height="60" alt="Foto Perfil" class="img-round">
                         </div>
                     @endif
                 </div>

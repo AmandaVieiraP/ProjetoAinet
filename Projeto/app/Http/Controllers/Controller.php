@@ -14,7 +14,8 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-    public function initialPage() {
+    public function initialPage()
+    {
         $users = User::all();
         $movements = Movement::all();
         $accounts = Account::all();

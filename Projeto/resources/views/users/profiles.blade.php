@@ -1,6 +1,8 @@
 @extends('master')
 @section('content')
 
+@include('users.partials.menuProfile')
+
 <div class="container-fluid" id='bg-light-grey'>
     <h5> Search user by name </h5>
     <form action="{{ route('users.profiles') }}" method="get" class="form-inline">
@@ -29,11 +31,11 @@
                 <td>
                     @if (is_null($user->profile_photo))
                         <div class="float-left"> 
-                            <img src="/images/user.png" alt="user" width="50" height="60">
+                            <img src="{{asset('storage/profiles/avatar.jpg')}}" alt="profile_photo" width="50" height="60" class="img-round">
                         </div>
                     @else 
                         <div class="float-left"> 
-                            <img src="{{asset('storage/profiles/'.$user->profile_photo)}}" alt="profile_photo" width="50" height="60">
+                            <img src="{{asset('storage/profiles/'.$user->profile_photo)}}" alt="profile_photo" width="50" height="60" class="img-round">
                         </div>
                     @endif
                 </td>

@@ -36,29 +36,74 @@ class AuthServiceProvider extends ServiceProvider
 
         //user so pode editar contas que lhe pertençam
         Gate::define('edit-account', function ($user, $account_id) {
-           return $user->isOwner($account_id);
+            return $user->isOwner($account_id);
         });
 
-        Gate::define('download-document',function ($user, $document_id){
-
-            $movement=Movement::where('document_id',$document_id)->first();
+        Gate::define('download-document', function ($user, $document_id) {
+            $movement=Movement::where('document_id', $document_id)->first();
 
             $account=Account::findOrFail($movement->account_id);
 
             $users = Auth::user()->associateds;
 
             foreach ($users as $u) {
-                if($user==$u)
+                if ($user==$u) {
                     return true;
+                }
             }
+<<<<<<< HEAD
+=======
+            
+
+            $documentOwner = Account::findOrFail($document_id)->user;
+            $associateds = $user->associated_of;
+            foreach ($associateds as $u) {
+                if ($u->id==$documentOwner->id) {
+                    return true;
+                }
+            }
+>>>>>>> 1ac3afbde4c0de38091aa0080292109c7ff0f201
 
             return $user->id==$account->owner_id;
-
         });
 
-        Gate::define('view-account-movements', function($user, $account) {
+        Gate::define('view-account-movements', function ($user, $account) {
             $accountOwner = $account->user;
             return $user->id == $accountOwner->id;
         });
+<<<<<<< HEAD
+=======
+
+        Gate::define('view-accounts', function ($user, $userId) {
+            $associated_of = $user->associated_of;
+            foreach ($associated_of as $u) {
+                if ($u->id==$userId) {
+                    return true;
+                }
+            }
+
+            $associateds = $user->associateds;
+            
+            foreach ($associated_of as $u) {
+                if ($u->id==$userId) {
+                    return false;
+                }
+            }
+            
+            return $user->id == $userId;
+        });
+    
+        Gate::define('view-movements', function ($user, $account) {
+            $accountOwner = Account::findOrFail($account)->user;
+          
+            $associateds = $user->associated_of;
+            foreach ($associateds as $u) {
+                if ($u->id==$accountOwner->id) {
+                    return true;
+                }
+            }
+            return $user->id == $accountOwner->id;
+        });
+>>>>>>> 1ac3afbde4c0de38091aa0080292109c7ff0f201
     }
 }

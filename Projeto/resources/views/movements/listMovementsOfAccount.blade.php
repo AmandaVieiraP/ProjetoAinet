@@ -26,7 +26,7 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
           <li>
-            <a class="nav-link" href="{{ route('movement.create', $account->id) }}">Add Movement</a>
+            <a class="nav-link" href="{{ route('movement.create', $account->id) }}"><strong>Add Movement</strong></a>
           </li>
         </ul>
       </div>
@@ -43,8 +43,8 @@
                 <th>Value</th>
                 <th>Type</th>
                 <th>End Balance</th>
-                <th>Actions</th>
-                <th colspan="3">Document</th>
+                <th class="text-center">Actions</th>
+                <th colspan="3" class="text-center">Document</th>
             </tr>
         </thead>
         <tbody>
@@ -76,6 +76,9 @@
                 @if (!is_null($movement->document_id))
                 <td>
                     <a href="{{ route('document.show',['document'=>$movement->document_id])}}"  class="btn btn-secondary btn-xs">Download</a>
+                </td>
+                <td>
+                    <a href="{{ route('document.show',['document'=>$movement->document_id])}}"  class="btn btn-secondary btn-xs" name="view">View</a>
                 </td>
                 <td>
                     <form action="{{ route('document.destroy',['document'=>$movement->document_id]) }}" method="POST">
