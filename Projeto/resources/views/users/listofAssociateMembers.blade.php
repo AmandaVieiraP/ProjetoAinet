@@ -27,6 +27,7 @@
 <table class="table table-striped">
     <thead>
         <tr>
+            <th></th>
             <th>Photo</th>
             <th>Name</th>
             <th>Email</th>
@@ -37,17 +38,18 @@
     <tbody>
     @foreach ($users as $user)    
         <tr>
-        	<td>
-        		@if (auth()->user()->profile_photo)
+            <td class="text-center"><strong>{{ $loop->index+1 }}</strong></td>
+            <td>
+                @if (auth()->user()->profile_photo)
                     <div class="float-left">
-        			     <img src="{{ asset('storage/profiles/'.$user->profile_photo) }}" alt="Foto Perfil" width="50" height="60" class="img-round">
+                         <img src="{{ asset('storage/profiles/'.$user->profile_photo) }}" alt="Foto Perfil" width="50" height="60" class="img-round">
                     </div>
-			    @else
+                @else
                     <div class="float_left">
                         <img src="{{ asset('storage/profiles/avatar.jpg') }}" width="50" height="60" alt="Foto Perfil" class="img-round">
                     </div>
-			    @endif
-        	</td>
+                @endif
+            </td>
             <td>{{ $user->name }}</td>
             <td>{{ $user->email }}</td>
             <td>{{ $user->phone }}</td>
@@ -62,6 +64,9 @@
         </tr>
     @endforeach
     </table>
+    <div class="pagination pagination-centered">
+        {{ $users->links() }}
+    </div>
 
 @else 
     <h2>No users found</h2> 

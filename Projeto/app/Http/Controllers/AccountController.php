@@ -11,23 +11,17 @@ use App\AccountType;
 use App\Account;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
-
+use App\Movement;
+use \App\Http\Requests\StoreAccount;
+use Illuminate\Support\Facades\Gate;
 
 class AccountController extends Controller
 {
-    public function __construct(){
+    public function __construct()
+    {
         $this->middleware('auth');
     }
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
-
+    
     /**
      * Show the form for creating a new resource.
      *
@@ -38,7 +32,7 @@ class AccountController extends Controller
         $pagetitle="Add New Account";
         $types = AccountType::all();
 
-        return view('accounts.createAccount', compact('pagetitle','types')); 
+        return view('accounts.createAccount', compact('pagetitle', 'types'));
     }
 
     /**
@@ -49,15 +43,16 @@ class AccountController extends Controller
      */
     public function store(Request $request)
     {
-        if($request->has('cancel'))
-            return redirect()->route('accounts',Auth::user()->id);
+        if ($request->has('cancel')) {
+            return redirect()->route('accounts', Auth::user()->id);
+        }
 
         $accounts=Auth::user()->allAccounts;
 
         $types=[];
         $codes=[];
         
-        foreach($accounts as $a){
+        foreach ($accounts as $a) {
             $types[]=$a->account_type_id;
             $codes[]=$a->code;
         }
@@ -68,7 +63,7 @@ class AccountController extends Controller
            'date'=>'date',
            'start_balance'=>'required',
            'description'=>'nullable',
-        ], [ 
+        ], [
             'account_type_id.required' => 'The account type can not be empty',
             'account_type_id.exists' => 'The type choosen is not valid',
             'code.required' => 'The code can not be empty',
@@ -77,38 +72,27 @@ class AccountController extends Controller
 
         ]);
 
-        if(!is_numeric($request->input('start_balance'))){
+        if (!is_numeric($request->input('start_balance'))) {
             return redirect()->route('account.store')->withErrors(['start_balance' => 'The start_balance must be a numeric value in format <0.00>']);
         }
 
-        if(in_array($request->input('account_type_id'),$types)){
+        if (in_array($request->input('account_type_id'), $types)) {
             return redirect()->route('account.store')->withErrors(['account_type_id' => 'You already have an account with this type']);
         }
 
-        if(in_array($request->input('code'),$codes)){
+        if (in_array($request->input('code'), $codes)) {
             return redirect()->route('account.store')->withErrors(['code' => 'The code is already in use']);
         }
 
-        if(!$request->filled('date')){
-            $validatedData['date']=Carbon::now();
+        if (!$request->filled('date')) {
+            $validatedData['date']=Carbon::now()->format('Y-m-d');
         }
 
         $validatedData['current_balance']=$request->input('start_balance');
         $validatedData['owner_id']=Auth::user()->id;
         $account=Account::create($validatedData);
 
-        return redirect()->route('accounts',Auth::user()->id)->with('successMsg', 'Account created!');
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
+        return redirect()->route('accounts', Auth::user()->id)->with('successMsg', 'Account created!');
     }
 
     /**
@@ -124,9 +108,8 @@ class AccountController extends Controller
         $pagetitle = "Update Account";
 
         if (Auth::user()->can('edit-account', $id)) {
-            return view('accounts.editAccount', compact('types','account','pagetitle'));    
-        }
-        else{
+            return view('accounts.editAccount', compact('types', 'account', 'pagetitle'));
+        } else {
             $pagetitle = "Unauthorized";
             return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
@@ -144,34 +127,58 @@ class AccountController extends Controller
         if ($request->has('cancel')) {
             return redirect()->route('home');
         }
+
         $account = Account::findOrFail($id);
+
         if (!Auth::user()->can('edit-account', $id)) {
             $pagetitle = "Unauthorized";
             return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
-
+        //$validatedData=  $request->validated();
         $validatedData=$request->validate([
-            'code'=> ['required', Rule::unique('accounts')->where(function ($query){
-               return $query->where('owner_id', Auth::id());
+            'code'=> ['required', Rule::unique('accounts')->where(function ($query) {
+                return $query->where('owner_id', Auth::id());
             })],
-            'account_type_id'=>['required', 'exists:account_types,id',Rule::unique('accounts')->where(function ($query){
-               return $query->where('owner_id', Auth::id());
+            'account_type_id'=>['required', 'exists:account_types,id',Rule::unique('accounts')->where(function ($query) {
+                return $query->where('owner_id', Auth::id());
             })],
-            'start_balance' => 'required|numeric|min:0',
+            'start_balance' => 'required|numeric',
             'description'=>'nullable|string',
             'date'=>'required|date',
-        ], [ 
+        ], [
             'account_type_id.required' => 'The account type can not be empty',
             'account_type_id.exists' => 'The type choosen is not valid',
             'code.required' => 'The code can not be empty',
             'date.required' => 'The date field can not be empty',
             'date.date' => 'The date is invalid',
-            'start_balance.required'=> 'The start balance value can not be empty',       
+            'start_balance.required'=> 'The start balance value can not be empty',
         ]);
 
+        $old_bal = $account->start_balance;
         $account->fill($validatedData);
+
+        if ($old_bal != $account->start_balance) {
+            $movements=Movement::where('account_id', '=', $account->id)->orderBy('date')->get();
+            if (count($movements)==0) {
+                $account->current_balance = $validatedData['start_balance'];
+            } else {
+                $ultimo=$account->start_balance;
+                foreach ($movements as $mov) {
+                    $mov->start_balance = $ultimo;
+                    if (strcmp($mov->type, "expense") ==0) {
+                        $mov->end_balance= round($mov->start_balance - $mov->value, 2);
+                    } else {
+                        $mov->end_balance= round($mov->start_balance + $mov->value, 2);
+                    }
+                    $ultimo = round($mov->end_balance, 2);
+                    $mov->update();
+                }
+                $account->current_balance = round($ultimo, 2);
+            }
+        }
+
         $account->update();
-        return redirect()->route('accounts',Auth::user()->id)->with('successMsg', 'Your account has been updated');
+        return redirect()->route('home')->with('success', 'Your account has been updated');
     }
 
     /**
@@ -186,101 +193,103 @@ class AccountController extends Controller
         $movements = $account->movements;
         $user = $account->user;
 
-        if(Auth::user()->id != $user->id) {
+        if (Auth::user()->id != $user->id) {
             $pagetitle = "Unauthorized";
-            return Response::make(view('errors.403', compact('pagetitle')), 403); 
-        } 
+            return Response::make(view('errors.403', compact('pagetitle')), 403);
+        }
 
         if (is_null($account->last_movement_date) && $movements->isEmpty()) {
             $account->forceDelete();
-            return redirect()->route('accounts', $user->id)->with('successMsg', "Account was deleted succesfully");  
-        } 
+            return redirect()->route('accounts', $user->id)->with('successMsg', "Account was deleted succesfully");
+        }
     
         //soft delete
         $account->delete();
-        return redirect()->route('accounts', $user->id)->with('warningMsg', "Account couldn't be deleted succesfully because it at movements so it was closed");  
+
+        return redirect()->route('accounts', $user->id)->with('warningMsg', "Account couldn't be deleted succesfully because it at movements so it was closed");
     }
 
-
-    public function showAccounts($user){
-        $user = User::findOrFail($user);
-        if(Auth::user()->id != $user->id) {
+    //deve ser visivel tabme por associados
+    public function showAccounts($id)
+    {
+        $user = User::findOrFail($id);
+        
+        if (Gate::denies('view-accounts', $id)) {
             $pagetitle = "Unauthorized";
-            return Response::make(view('errors.403', compact('pagetitle')), 403); 
+            return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
-        $accounts = $user->allAccounts;
+
+        $accounts = $user->allAccounts()->paginate(10);
         $accounts_type = AccountType::all();
 
         $pagetitle = "User's accounts";
         
-        return view('accounts.listUserAccounts', compact('accounts', 'accounts_type', 'user', 'pagetitle')); 
+        return view('accounts.listUserAccounts', compact('accounts', 'accounts_type', 'user', 'pagetitle'));
     }
 
-    public function showOpenAccounts($user){
-        $user = User::findOrFail($user);
-        if(Auth::user()->id != $user->id) {
+    public function showOpenAccounts($id)
+    {
+        $user = User::findOrFail($id);
+        if (Auth::user()->id != $user->id) {
             $pagetitle = "Unauthorized";
-            return Response::make(view('errors.403', compact('pagetitle')), 403); 
+            return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
-        $allAccounts = $user->allAccounts;
+        $accounts = $user->openAccounts()->paginate(6);
         $accounts_type = AccountType::all();
-
-          $accounts = array();
-       foreach ($allAccounts as $a) {
-            if(!$a->trashed()) {
-                $accounts[] = $a;
-            } 
-        }  
 
         $pagetitle = "User's open accounts";
 
-        return view('accounts.listUserAccounts', compact('accounts', 'accounts_type', 'user', 'pagetitle')); 
-
+        return view('accounts.listUserAccounts', compact('accounts', 'accounts_type', 'user', 'pagetitle'));
     }
-    public function showCloseAccounts($user){
-        $user = User::findOrFail($user);
-        if(Auth::user()->id != $user->id) {
+
+    public function showCloseAccounts($id)
+    {
+        $user = User::findOrFail($id);
+        if (Auth::user()->id != $user->id) {
             $pagetitle = "Unauthorized";
-            return Response::make(view('errors.403', compact('pagetitle')), 403); 
+            return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
 
         $accounts_type = AccountType::all();
 
-        $accounts = $user->closedAccounts;
+        $accounts = $user->closedAccounts()->paginate(10);
 
         $pagetitle = "User's closed accounts";
 
-        return view('accounts.listUserAccounts', compact('accounts', 'accounts_type', 'user', 'pagetitle')); 
+        return view('accounts.listUserAccounts', compact('accounts', 'accounts_type', 'user', 'pagetitle'));
     }
 
-    public function updateClose($account){
-        $account = Account::findOrFail($account);
+    public function updateClose($id)
+    {
+        $account = Account::findOrFail($id);
         $user = $account->user;
-        if(Auth::user()->id != $user->id) {
+
+        if (Auth::user()->id != $user->id) {
             $pagetitle = "Unauthorized";
-            return Response::make(view('errors.403', compact('pagetitle')), 403); 
+            return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
+
         //soft delete
         $account->delete();
+
         return redirect()->route('accounts', $user->id)->with('successMsg', "Account was closed succesfully");
     }
 
-    public function updateReopen($account){
-        
-        $account = Account::withTrashed()->findOrFail($account);
+    public function updateReopen($id)
+    {
+        $account = Account::withTrashed()->findOrFail($id);
         
         $user = $account->user;
 
-        if(Auth::user()->id != $user->id) {
+        if (Auth::user()->id != $user->id) {
             $pagetitle = "Unauthorized";
-            return Response::make(view('errors.403', compact('pagetitle')), 403); 
+            return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
 
-        if($account->trashed()){
+        if ($account->trashed()) {
             $account->restore();
         }
 
         return redirect()->route('accounts', $user->id)->with('successMsg', "Account was open succesfully");
-
     }
 }

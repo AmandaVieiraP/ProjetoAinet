@@ -12,7 +12,7 @@
 */
 
 //US1
-Route::get('/', 'Controller@initialPage')->name('initial.page');
+Route::get('/', 'Controller@initialPage')->name('initialPage');
 
 //US2, US3, US4
 Auth::routes();
@@ -42,14 +42,14 @@ Route::get('/me/profile', 'UserController@showEditMyProfileForm')->name('me.prof
 Route::put('/me/profile', 'UserController@updateMyProfile')->name('me.profile');
 
 //US11
-Route::get('/profiles', 'UserController@getProfile')->name('users.profiles');
+Route::get('/profiles', 'UserController@getProfiles')->name('users.profiles');
 
 //US12
 Route::get('/me/associates', 'UserController@getAssociates')->name('users.associates');
 
 //US13
 Route::get('/me/associate-of', 'UserController@getAssociateOfMe')->name('me.associateOf');
-//ACRESCENTADO
+
 Route::get('/me/accounts', function () {
     return redirect()->route('accounts.opened', Auth::id());
 })->name('my.accounts');

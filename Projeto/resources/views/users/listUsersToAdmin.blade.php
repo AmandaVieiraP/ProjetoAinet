@@ -39,10 +39,12 @@
     </form>
 </br>
 </div>
+
 @if (count($users))
     <table class="table table-striped">
         <thead>
             <tr>
+                <th></th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Admin</th>
@@ -53,6 +55,7 @@
         <tbody>
         @foreach ($users as $user)    
             <tr>
+                <td class="text-center"><strong>{{ $loop->index+1 }}</strong></td>
                 <td>{{ $user->name}}</td>
                 <td>{{ $user->email}}</td>
                 <td> @if($user->admin == 1)
@@ -105,7 +108,10 @@
             </tr>
         @endforeach
     </table>
-    
+
+    <div class="pagination pagination-centered">
+        {{ $users->links() }}
+    </div>   
 
 @else 
     <h2>No users found</h2>

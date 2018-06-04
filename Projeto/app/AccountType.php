@@ -6,7 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class AccountType extends Model
 {
-    public function accounts() {
+    public function accounts()
+    {
         return $this->hasMany('App\Account');
     }
 }

@@ -28,5 +28,4 @@
     </script>
 
     <div id="chart_div">
-    
-  </div>
+</div>

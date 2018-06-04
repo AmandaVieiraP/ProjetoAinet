@@ -4,19 +4,17 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Document extends Model
+class AssociateMember extends Model
 {
-    protected $fillable = [
-         'id','type', 'original_name', 'description',
-    ];
-
+	//protected $table = 'associate_members';
+	
     public $timestamps  = false;
 
-    public function movement()
-    {
-        return $this->belongsTo('App\Movement', 'document_id');
-    }
+    protected $fillable = [
+    	'main_user_id','associated_user_id'
+    ];
 
+    //Para garantir que quando cria coloca o created_at
     public static function boot()
     {
         parent::boot();

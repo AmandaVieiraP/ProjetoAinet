@@ -19,6 +19,7 @@
     <table class="table table-striped">
         <thead>
             <tr>
+                <th></th>
                 <th>Code</th>
                 <th>Type</th>
                 <th>Date</th>
@@ -30,22 +31,23 @@
         <tbody>
         @foreach ($accounts as $account)    
             <tr>
+                <td class="text-center"><strong>{{ $loop->index+1 }}</strong></td>
                 <td>{{ $account->code}}</td>
                 <td> 
-                	@foreach($accounts_type as $type) 
-                		@if ($account->account_type_id == $type->id)
-                			{{ $type->name }}
-                		@endif
-                	@endforeach
+                    @foreach($accounts_type as $type) 
+                        @if ($account->account_type_id == $type->id)
+                            {{ $type->name }}
+                        @endif
+                    @endforeach
                 </td>
                 <td>{{ $account->date }} </td>
                 <td>{{ $account->current_balance}} </td> 
                 <td> 
-                	 @if (is_null($account->deleted_at)) 
-                	 	<span> Open </span>
-                	 @else 
-                	    <span> Closed </span>
-                	 @endif
+                     @if (is_null($account->deleted_at)) 
+                        <span> Open </span>
+                     @else 
+                        <span> Closed </span>
+                     @endif
                 </td>
                 <td> 
                   
@@ -76,6 +78,9 @@
             </tr>
         @endforeach
     </table>
+    <div class="pagination pagination-centered">
+        {{ $accounts->links() }}
+    </div> 
 @else 
    <h5>No accounts found</h5>
 

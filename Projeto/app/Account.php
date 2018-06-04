@@ -16,27 +16,23 @@ class Account extends Model
 
     public $timestamps = false;
     
-    public function user() {
+    public function user()
+    {
         return $this->belongsTo('App\User', 'owner_id');
     }
 
-    public function movements() {
+    public function movements()
+    {
         return $this->hasMany('App\Movement');
     }
 
-    public function movementsOrderByDateDesc() {
-        return $this->hasMany('App\Movement')->orderBy('date', 'desc');
+    public function movementsOrderByDateDesc()
+    {
+        return $this->hasMany('App\Movement')->orderBy('date');
     }
 
-    public function movementsOrderByDateAsc() {
-        return $this->hasMany('App\Movement')->orderBy('date', 'asc');
-    }
-
-    public function accountType() {
+    public function accountType()
+    {
         return $this->belongsTo('App\AccountType');
     }
-
-    /* public function getUpdatedAtColumn() {
-        return null;
-    } */
 }

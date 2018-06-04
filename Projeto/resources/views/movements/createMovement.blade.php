@@ -24,13 +24,13 @@
 
 <form method="POST" action="{{ route('movement.store', $account->id) }}" enctype="multipart/form-data">
     @csrf
-   	@include('movements.partials.addEditMovement')
+    @include('movements.partials.addEditMovement')
 
     <div class="form-group">
-    	<div class="col-sm-offset-5 col-sm-6">
-    		<button type="submit" class="btn btn-outline-primary" name="ok">Submit</button>
-    		<button type="submit" class="btn btn-outline-primary" name="cancel">Cancel</button>
-    	</div>
+        <div class="col-sm-offset-5 col-sm-6">
+            <button type="submit" class="btn btn-outline-primary" name="ok">Submit</button>
+            <button type="submit" class="btn btn-outline-primary" name="cancel">Cancel</button>
+        </div>
     </div>
 </form>
 

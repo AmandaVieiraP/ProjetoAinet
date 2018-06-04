@@ -7,6 +7,7 @@
 <table class="table table-striped">
     <thead>
         <tr>
+            <th></th>
             <th>Photo</th>
             <th>Name</th>
             <th>Email</th>
@@ -17,6 +18,7 @@
     <tbody>
     @foreach ($users as $user)    
         <tr>
+            <td class="text-center"><strong>{{ $loop->index+1 }}</strong></td>
             <td>
                 <div class="float-left"> 
                     @if (auth()->user()->profile_photo)
@@ -37,6 +39,10 @@
         </tr>
     @endforeach
     </table>
+
+    <div class="pagination pagination-centered">
+        {{ $users->links() }}
+    </div>
 
 @else 
     <h2>No users found</h2>

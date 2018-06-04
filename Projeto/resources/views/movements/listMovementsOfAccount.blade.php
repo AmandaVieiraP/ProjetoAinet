@@ -26,6 +26,11 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
           <li>
+            <a class="nav-link" href="{{ route('my.accounts') }}"><strong>Go Back</strong></a>
+          </li>
+        </ul>
+        <ul class="navbar-nav">
+          <li>
             <a class="nav-link" href="{{ route('movement.create', $account->id) }}"><strong>Add Movement</strong></a>
           </li>
         </ul>
@@ -35,27 +40,29 @@
 @endif
 
 @if(count($movements))
-	<table class="table table-striped">
+    <table class="table table-striped">
         <thead>
             <tr>
+                <th></th>
                 <th>Category</th>
                 <th>Date</th>
                 <th>Value</th>
                 <th>Type</th>
                 <th>End Balance</th>
                 <th class="text-center">Actions</th>
-                <th colspan="3" class="text-center">Document</th>
+                <th colspan="4" class="text-center">Document</th>
             </tr>
         </thead>
         <tbody>
         @foreach ($movements as $movement)    
             <tr>
+                <td class="text-center"><strong>{{ $loop->index+1 }}</strong></td>
                 <td>
-                	@foreach($movementCategories as $category)
-                		@if ($movement->movement_category_id == $category->id)
-                			{{ $category->name }}
-                		@endif
-                	@endforeach
+                    @foreach($movementCategories as $category)
+                        @if ($movement->movement_category_id == $category->id)
+                            {{ $category->name }}
+                        @endif
+                    @endforeach
                 </td>
                 <td>{{ $movement->date }}</td>
                 <td> {{ $movement->value }} </td>
@@ -67,7 +74,7 @@
                         @csrf
                         @method('delete')
                         <input type="hidden" name="movementId" value="{{ $movement->id }}">
-                        <button type="submit" class="btn btn-xs btn-secondary btn-block">Delete</button>
+                        <button type="submit" class="btn btn-xs btn-secondary  btn-block">Delete</button>
                     </form> 
                 </td>
                 <td>
@@ -94,8 +101,9 @@
             </tr>
         @endforeach
     </table>
-
-
+    <div class="pagination pagination-centered">
+        {{ $movements->links() }}
+    </div> 
 @else
     </br>
     <h2>No movements founds for that account </h2>

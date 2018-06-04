@@ -53,7 +53,7 @@
                                 </a>
 
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('initial.page') }}">
+                                    <a class="dropdown-item" href="{{ route('initialPage') }}">
                                         Home Page
                                     </a>
                                     <a class="dropdown-item" href="{{ route('home') }}">
