@@ -20,71 +20,123 @@ Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
 Route::get('register', 'Auth\RegisterController@showRegistrationForm')->name('register');
 Route::get('/home', 'HomeController@index')->name('home');
 
-//US5, US6
-Route::get('/users', 'UserController@listAllUsersToAdmin')->middleware('admin')->name('list.of.all.users');
+Route::group(
+    ['prefix'=>'users',
+      'middleware' => 'admin',
+    ],
+    function () {
+        //US5, US6
+        Route::get('/', 'UserController@listAllUsersToAdmin')->name('list.of.all.users');
+        //US7
+        Route::get('{user}/block', 'UserController@blockUser')->name('block.user');
+        Route::patch('{user}/block', 'UserController@blockUser')->name('block.user');
+        Route::get('{user}/unblock', 'UserController@unblockUser')->name('unblock.user');
+        Route::patch('{user}/unblock', 'UserController@unblockUser')->name('unblock.user');
+        Route::get('{user}/promote', 'UserController@promoteUser')->name('promote.user');
+        Route::patch('{user}/promote', 'UserController@promoteUser')->name('promote.user');
+        Route::get('{user}/demote', 'UserController@demoteUser')->name('demote.user');
+        Route::patch('{user}/demote', 'UserController@demoteUser')->name('demote.user');
+        
+    }
+);
 
-//US7
-Route::get('/users/{user}/block', 'UserController@blockUser')->middleware('admin')->name('block.user');
-Route::patch('/users/{user}/block', 'UserController@blockUser')->middleware('admin')->name('block.user');
-Route::get('/users/{user}/unblock', 'UserController@unblockUser')->middleware('admin')->name('unblock.user');
-Route::patch('/users/{user}/unblock', 'UserController@unblockUser')->middleware('admin')->name('unblock.user');
-Route::get('/users/{user}/promote', 'UserController@promoteUser')->middleware('admin')->name('promote.user');
-Route::patch('/users/{user}/promote', 'UserController@promoteUser')->middleware('admin')->name('promote.user');
-Route::get('/users/{user}/demote', 'UserController@demoteUser')->middleware('admin')->name('demote.user');
-Route::patch('/users/{user}/demote', 'UserController@demoteUser')->middleware('admin')->name('demote.user');
 
-//US9
-Route::get('/me/password', 'UserController@showChangePasswordForm')->name('me.passwordForm');
-Route::patch('/me/password', 'UserController@changePassword')->name('me.password');
+Route::group(
+    ['prefix'=>'me',
+    ],
+    function () {
+        //US9
+        Route::get('password', 'UserController@showChangePasswordForm')->name('me.passwordForm');
+        Route::patch('password', 'UserController@changePassword')->name('me.password');
+        //US10
+        Route::get('profile', 'UserController@showEditMyProfileForm')->name('me.profileForm');
+        Route::put('profile', 'UserController@updateMyProfile')->name('me.profile');
+        //US12
+        Route::get('associates', 'UserController@getAssociates')->name('users.associates');
+        //US13
+        Route::get('associate-of', 'UserController@getAssociateOfMe')->name('me.associateOf');
 
-//US10
-Route::get('/me/profile', 'UserController@showEditMyProfileForm')->name('me.profileForm');
-Route::put('/me/profile', 'UserController@updateMyProfile')->name('me.profile');
+        Route::get('accounts', function () {
+            return redirect()->route('accounts.opened', Auth::id());
+        })->name('my.accounts');
+        //US.29
+        Route::get('newAssociate', 'UserController@getCreateAssociate')->name('get.createAssociate');
+        Route::post('associates', 'UserController@createAssociate')->name('me.createAssociate');
+
+        //US.30
+        Route::get('associates/{user}', function () {
+            return redirect()->route('users.associates');
+        })->name('users.show.associates');
+        Route::delete('associates/{user}', 'UserController@destroyAssociate')->name('users.associate.destroy');
+    }
+);
+
+
 
 //US11
 Route::get('/profiles', 'UserController@getProfiles')->name('users.profiles');
 
-//US12
-Route::get('/me/associates', 'UserController@getAssociates')->name('users.associates');
-
-//US13
-Route::get('/me/associate-of', 'UserController@getAssociateOfMe')->name('me.associateOf');
-
-Route::get('/me/accounts', function () {
-    return redirect()->route('accounts.opened', Auth::id());
-})->name('my.accounts');
 
 
-//US14
-Route::get('/accounts/{user}', 'AccountController@showAccounts')->name('accounts');
-Route::get('/accounts/{user}/opened', 'AccountController@showOpenAccounts')->name('accounts.opened');
-Route::get('/accounts/{user}/closed', 'AccountController@showCloseAccounts')->name('accounts.closed');
-Route::delete('/account/{account}', 'AccountController@destroy')->name('account.delete');
-Route::get('/account/{account}/close', 'AccountController@updateClose')->name('account.close');
-Route::patch('/account/{account}/close', 'AccountController@updateClose')->name('account.close');
-Route::patch('/account/{account}/reopen', 'AccountController@updateReopen')->name('account.reopen');
 
+Route::group(
+    ['prefix'=>'accounts',
+    ],
+    function () {
+        Route::get('{user}', 'AccountController@showAccounts')->name('accounts');
+        Route::get('{user}/opened', 'AccountController@showOpenAccounts')->name('accounts.opened');
+        Route::get('{user}/closed', 'AccountController@showCloseAccounts')->name('accounts.closed');
+        
+    }
+);
 
-//US17
-Route::get('/account', 'AccountController@create')->name('account.create');
-Route::post('/account', 'AccountController@store')->name('account.store');
+Route::group(
+    ['prefix'=>'account',
+    ],
+    function () {
+        //US.14
+        Route::delete('{account}', 'AccountController@destroy')->name('account.delete');
+        Route::get('{account}/close', 'AccountController@updateClose')->name('account.close');
+        Route::patch('{account}/close', 'AccountController@updateClose')->name('account.close');
+        Route::patch('{account}/reopen', 'AccountController@updateReopen')->name('account.reopen');
+        //US17
+        Route::get('/', 'AccountController@create')->name('account.create');
+        Route::post('/', 'AccountController@store')->name('account.store');
+        //US18
+        Route::get('{account}', 'AccountController@edit')->name('account.edit');
+        Route::put('{account}', 'AccountController@update')->name('account.update');
+        
+    }
+);
 
-//US18
-Route::get('/account/{account}', 'AccountController@edit')->name('account.edit');
-Route::put('/account/{account}', 'AccountController@update')->name('account.update');
+Route::group(
+    ['prefix'=>'movements',
+    ],
+    function () {
+        //US.20
+        Route::get('{account}', 'MovementController@index')->name('movement.index');
+        //US.21
+        Route::get('{account}/create', 'MovementController@create')->name('movement.create');
+        //US.21
+        Route::post('{account}/create', 'MovementController@store')->name('movement.store');
+        
+    }
+);
 
-//US.20
-Route::get('/movements/{account}', 'MovementController@index')->name('movement.index');
-//US.21
-Route::get('/movements/{account}/create', 'MovementController@create')->name('movement.create');
-//US.21
-Route::post('/movements/{account}/create', 'MovementController@store')->name('movement.store');
-//US.21
-Route::get('/movement/{movement}', 'MovementController@edit')->name('movement.edit');
-//US.21
-Route::put('/movement/{movement}', 'MovementController@update')->name('movement.update');
-//US.21
-Route::delete('/movement/{movement}', 'MovementController@destroy')->name('movement.destroy');
+Route::group(
+    ['prefix'=>'movement',
+    ], 
+    function () {
+        //US.21
+        Route::get('{movement}', 'MovementController@edit')->name('movement.edit');
+        //US.21
+        Route::put('{movement}', 'MovementController@update')->name('movement.update');
+        //US.21
+        Route::delete('{movement}', 'MovementController@destroy')->name('movement.destroy');
+            
+        
+    }
+);
 
 //US23
 Route::group(
@@ -108,18 +160,17 @@ Route::group(
     }
 );
 
-//US.26
-Route::get('/dashboard/{user}', 'UserController@show')->name('dashboard');
-//US27
-Route::get('/dashboard/{user}/expenses_revenues', 'ChartsController@showTotalExpensesAndRevenues')->name('user.totalExpensesRevenues');
-//US28
-Route::get('/dashboard/{user}/evolution', 'ChartsController@showMonthlyEvolution')->name('user.evolutionExpensesRevenues');
-//US.29
-Route::get('/me/newAssociate', 'UserController@getCreateAssociate')->name('get.createAssociate');
-Route::post('/me/associates', 'UserController@createAssociate')->name('me.createAssociate');
+Route::group(
+    ['prefix'=>'dashboard',
+    ],
+    function () {
+        //US.26
+        Route::get('{user}', 'UserController@show')->name('dashboard');
+        //US27
+        Route::get('{user}/expenses_revenues', 'ChartsController@showTotalExpensesAndRevenues')->name('user.totalExpensesRevenues');
+        //US28
+        Route::get('{user}/evolution', 'ChartsController@showMonthlyEvolution')->name('user.evolutionExpensesRevenues');
+    }
+);
 
-//US.30
-Route::get('/me/associates/{user}', function () {
-    return redirect()->route('users.associates');
-})->name('users.show.associates');
-Route::delete('/me/associates/{user}', 'UserController@destroyAssociate')->name('users.associate.destroy');
+

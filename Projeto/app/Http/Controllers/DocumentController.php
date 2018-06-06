@@ -19,17 +19,6 @@ class DocumentController extends Controller
     {
         $this->middleware('auth');
     }
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
-
     /**
      * Show the form for creating a new resource.
      *
@@ -42,18 +31,6 @@ class DocumentController extends Controller
 
         return view('movements.documents.uploadDocument', compact('movement', 'pagetitle'));
     }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
     /**
      * Display the specified resource.
      *
@@ -76,7 +53,6 @@ class DocumentController extends Controller
           return $this->showInBrowser($id);
        
         }
-        dd("parou fora");
         return Storage::download('documents/'.$movement->account_id.'/'.$movement->id.'.'.$document->type, $document->original_name, []);
     }
 
@@ -94,17 +70,6 @@ class DocumentController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -116,7 +81,7 @@ class DocumentController extends Controller
         $movement=Movement::findOrFail($id);
         $account=Account::findOrFail($movement->account_id);
 
-        if (Auth::user()->id != $account->owner_id) {
+        if (Auth::id() != $account->owner_id) {
             $pagetitle = "Unauthorized";
             return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
@@ -134,7 +99,6 @@ class DocumentController extends Controller
             'document_file.mimes' =>'The document must be a file pdf, png, jpeg.',
         ]);
 
-        //Depois de validar o documento criar o documento
         $documentArray['type']=$request->file('document_file')->getClientOriginalExtension();
         $documentArray['original_name']=$request->file('document_file')->getClientOriginalName();
         $documentArray['description']=$request->input('document_description');
@@ -162,9 +126,7 @@ class DocumentController extends Controller
               )
             );
         }
-        
-        //armazenar o documento na Strorage
-        Storage::putFileAs('documents/'.$account->id.'/', $request->file('document_file'), $movement->id.'.'.$documentArray['type']);
+         Storage::putFileAs('documents/'.$account->id.'/', $request->file('document_file'), $movement->id.'.'.$documentArray['type']);
         
         return redirect()->route('movement.index', ['account' => $account->id])->with('successMsg', 'Your document has been uploaded');
         ;
@@ -184,7 +146,7 @@ class DocumentController extends Controller
 
         $account=Account::findOrFail($movement->account_id);
 
-        if (Auth::user()->id != $account->owner_id) {
+        if (Auth::id() != $account->owner_id) {
             $pagetitle = "Unauthorized";
             return Response::make(view('errors.403', compact('pagetitle')), 403);
         }

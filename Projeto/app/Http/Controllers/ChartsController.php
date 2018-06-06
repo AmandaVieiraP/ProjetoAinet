@@ -25,18 +25,7 @@ class ChartsController extends Controller
             ->where('movements.date', '<=', $final)
             ->where('accounts.owner_id', '=', $id)
             ->groupBy('movement_categories.name', 'movements.type')
-            ->get();
-
-        //Consulta no adminer para confirmar --> depois apagar
-        /*SELECT sum(m.`value`) as total,mov.`name`, m.`type`
-        FROM `movements` m
-        inner join `accounts` a
-        on m.`account_id`=a.`id`
-        inner join `movement_categories` mov
-        on m.`movement_category_id`=mov.`id`
-        where a.`owner_id`=44 and DATE_ADD(m.`date`,INTERVAL -1 MONTH)>='2016-12' and DATE_ADD(m.`date`,INTERVAL -1 MONTH)<='2018-05'
-        group by mov.`name`, m.`type`;
-        */
+            ->get();   
         return view('accounts.partials.expensesRevenuesByDate', compact('totalExpenseRevenue', 'pagetitle', 'id'));
     }
 
@@ -59,18 +48,7 @@ class ChartsController extends Controller
             ->groupBy('movement_categories.name', 'movements.type', DB::raw('date'))
             ->orderBy(DB::raw('date'))
             ->get();
-
-        //Consulta no adminer para confirmar --> depois apagar
-        /*SELECT sum(m.`value`) as total,mov.`name`, m.`type`,date_format(m.`date`,'%M %Y') as date
-        FROM `movements` m
-        inner join `accounts` a
-        on m.`account_id`=a.`id`
-        inner join `movement_categories` mov
-        on m.`movement_category_id`=mov.`id`
-        where a.`owner_id`=44 and DATE_ADD(m.`date`,INTERVAL -1 MONTH)>='2016-12' and DATE_ADD(m.`date`,INTERVAL -1 MONTH)<='2018-05'
-        group by mov.`name`, m.`type`,date_format(m.`date`,'%M %Y');
-        */
-
+            
         return view('accounts.partials.expensesRevenuesEvolution', compact('evolutionExpenseRevenue', 'pagetitle', 'id'));
     }
 

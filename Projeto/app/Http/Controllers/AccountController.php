@@ -158,27 +158,6 @@ class AccountController extends Controller
 
         $old_bal = $account->start_balance;
         $account->fill($validatedData);
-/*
-        if ($old_bal != $account->start_balance) {
-            $movements=Movement::where('account_id', '=', $account->id)->orderBy('date')->get();
-            if (count($movements)==0) {
-                $account->current_balance = $validatedData['start_balance'];
-            } else {
-                $ultimo=$account->start_balance;
-                foreach ($movements as $mov) {
-                    $mov->start_balance = $ultimo;
-                    if (strcmp($mov->type, "expense") ==0) {
-                        $mov->end_balance= round($mov->start_balance - $mov->value, 2);
-                    } else {
-                        $mov->end_balance= round($mov->start_balance + $mov->value, 2);
-                    }
-                    $ultimo = round($mov->end_balance, 2);
-                    $mov->update();
-                }
-                $account->current_balance = round($ultimo, 2);
-            }
-        }
-*/
 
         if ($old_bal != $account->start_balance) {
             $movements=Movement::where('account_id', '=', $account->id)->orderBy('date')->get();
@@ -196,12 +175,9 @@ class AccountController extends Controller
                     $ultimo = bcmul($mov->end_balance, 1 ,2);
                     $mov->update();
                 }
-                //DB::table('movements')->update((array)$movements);
                 $account->current_balance = bcmul($ultimo, 1 , 2);
             }
         }
- 
-
         $account->update();
         return redirect()->route('home')->with('success', 'Your account has been updated');
     }
@@ -218,7 +194,7 @@ class AccountController extends Controller
         $movements = $account->movements;
         $user = $account->user;
 
-        if (Auth::user()->id != $user->id) {
+        if (Auth::id() != $user->id) {
             $pagetitle = "Unauthorized";
             return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
@@ -255,7 +231,7 @@ class AccountController extends Controller
     public function showOpenAccounts($id)
     {
         $user = User::findOrFail($id);
-        if (Auth::user()->id != $user->id) {
+        if (Auth::id() != $user->id) {
             $pagetitle = "Unauthorized";
             return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
@@ -270,7 +246,7 @@ class AccountController extends Controller
     public function showCloseAccounts($id)
     {
         $user = User::findOrFail($id);
-        if (Auth::user()->id != $user->id) {
+        if (Auth::id() != $user->id) {
             $pagetitle = "Unauthorized";
             return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
@@ -289,7 +265,7 @@ class AccountController extends Controller
         $account = Account::findOrFail($id);
         $user = $account->user;
 
-        if (Auth::user()->id != $user->id) {
+        if (Auth::id() != $user->id) {
             $pagetitle = "Unauthorized";
             return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
@@ -306,7 +282,7 @@ class AccountController extends Controller
         
         $user = $account->user;
 
-        if (Auth::user()->id != $user->id) {
+        if (Auth::id() != $user->id) {
             $pagetitle = "Unauthorized";
             return Response::make(view('errors.403', compact('pagetitle')), 403);
         }

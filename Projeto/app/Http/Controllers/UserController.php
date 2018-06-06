@@ -187,7 +187,7 @@ class UserController extends Controller
     public function blockUser(Request $request, $user)
     {
         $userToBlock = User::findOrFail($user);
-        if (Auth::user()->id == $userToBlock->id) {
+        if (Auth::id() == $userToBlock->id) {
             $pagetitle = "Unauthorized";
             return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
@@ -204,7 +204,7 @@ class UserController extends Controller
     {
         $userToUnblock = User::findOrFail($user);
         
-        if (Auth::user()->id == $userToUnblock->id) {
+        if (Auth::id() == $userToUnblock->id) {
             $pagetitle = "Unauthorized";
             return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
@@ -222,7 +222,7 @@ class UserController extends Controller
     {
         $userToPromote = User::findOrFail($user);
 
-        if (Auth::user()->id == $userToPromote->id) {
+        if (Auth::id() == $userToPromote->id) {
             $pagetitle = "Unauthorized";
             return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
@@ -241,7 +241,7 @@ class UserController extends Controller
     {
         $userToDemote = User::findOrFail($user);
 
-        if (Auth::user()->id == $userToDemote->id) {
+        if (Auth::id() == $userToDemote->id) {
             $pagetitle = "Unauthorized";
             return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
@@ -285,7 +285,7 @@ class UserController extends Controller
             return redirect()->route('me.password')->withErrors(['old_password' => 'Please enter the correct current password']);
         }
             
-        $user_id=Auth::user()->id;
+        $user_id=Auth::id();
         $user=User::findOrFail($user_id);
         $user->password=Hash::make($request->input('password'));
         $user->save();
@@ -308,7 +308,7 @@ class UserController extends Controller
         $validatedData=$request->validate([
             'name'=>'required|regex:/(^[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÊÍÏÓÒÖÚÇÑ ]+$)+/',
             'phone'=>'nullable|regex:/(^[0-9\+ ]+$)+/',
-            'email' => 'email|required|'.Rule::unique('users')->ignore(Auth::User()->id),
+            'email' => 'email|required|'.Rule::unique('users')->ignore(Auth::id()),
             'profile_photo'=>'nullable|image|mimes:png,jpeg,jpg',
         ], [
         'name.required' => 'Name must not be empty',
@@ -393,7 +393,7 @@ class UserController extends Controller
             'associated_user.exists'=>'You must pick a valid user',
         ]);
 
-        if ($request->input('associated_user')==Auth::user()->id) {
+        if ($request->input('associated_user')==Auth::id()) {
             return redirect()->route('users.associates')->withErrors(['associated_user'=>'Can not associate to yourself']);
         }
 
@@ -401,7 +401,7 @@ class UserController extends Controller
             return redirect()->route('users.associates')->withErrors(['associated_user'=>'This user is already associated to you']);
         }
         
-        AssociateMember::create(['main_user_id' => Auth::user()->id, 'associated_user_id'=>$request->input('associated_user'),]);
+        AssociateMember::create(['main_user_id' => Auth::id(), 'associated_user_id'=>$request->input('associated_user'),]);
         
         return redirect()->route('users.associates')->with('successMsg', 'User associated with success!');
     }
@@ -411,7 +411,7 @@ class UserController extends Controller
         $pagetitle= '404';
         $user= User::findOrFail($id);
       
-        if (Gate::allows('admin', Auth::user()->id)) {
+        if (Gate::allows('admin', Auth::id())) {
             DB::table('associate_members')->where('associated_user_id', $user->id)->delete();
         } else {
             $association = DB::table('associate_members')->where('associated_user_id', $id)->get();
