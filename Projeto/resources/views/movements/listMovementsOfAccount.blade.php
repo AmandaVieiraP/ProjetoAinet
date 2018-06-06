@@ -85,7 +85,9 @@
                     <a href="{{ route('document.show',['document'=>$movement->document_id])}}"  class="btn btn-secondary btn-xs">Download</a>
                 </td>
                 <td>
-                    <a href="{{ route('document.show',['document'=>$movement->document_id])}}"  class="btn btn-secondary btn-xs" name="view">View</a>
+                    <form method="Get" action="{{ route('document.show',['document'=>$movement->document_id])}}">
+                        <button type="submit" class="btn btn-secondary btn-xs" name="view">View</button>
+                    </form>
                 </td>
                 <td>
                     <form action="{{ route('document.destroy',['document'=>$movement->document_id]) }}" method="POST">

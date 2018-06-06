@@ -72,9 +72,11 @@ class DocumentController extends Controller
         }
 
         if($request->has('view')){
-            $this->showInBrowser($id);
+           
+          return $this->showInBrowser($id);
+       
         }
-
+        dd("parou fora");
         return Storage::download('documents/'.$movement->account_id.'/'.$movement->id.'.'.$document->type, $document->original_name, []);
     }
 
@@ -88,7 +90,6 @@ class DocumentController extends Controller
             $pagetitle = "Unauthorized";
             return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
-
         return response()->file('documents/'.$movement->account_id.'/'.$movement->id.'.'.$document->type);
     }
 

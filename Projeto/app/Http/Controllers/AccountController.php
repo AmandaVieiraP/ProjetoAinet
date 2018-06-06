@@ -14,6 +14,8 @@ use Illuminate\Validation\Rule;
 use App\Movement;
 use \App\Http\Requests\StoreAccount;
 use Illuminate\Support\Facades\Gate;
+use Laravel\Cashier\Billable;
+use Illuminate\Support\Facades\DB;
 
 class AccountController extends Controller
 {
@@ -156,7 +158,7 @@ class AccountController extends Controller
 
         $old_bal = $account->start_balance;
         $account->fill($validatedData);
-
+/*
         if ($old_bal != $account->start_balance) {
             $movements=Movement::where('account_id', '=', $account->id)->orderBy('date')->get();
             if (count($movements)==0) {
@@ -176,6 +178,29 @@ class AccountController extends Controller
                 $account->current_balance = round($ultimo, 2);
             }
         }
+*/
+
+        if ($old_bal != $account->start_balance) {
+            $movements=Movement::where('account_id', '=', $account->id)->orderBy('date')->get();
+            if (count($movements)==0) {
+                $account->current_balance = $validatedData['start_balance'];
+            } else {
+                $ultimo=$account->start_balance;
+                foreach ($movements as $mov) {
+                    $mov->start_balance = $ultimo;
+                    if (strcmp($mov->type, "expense") ==0) {
+                        $mov->end_balance= bcmul($mov->start_balance - $mov->value, 1, 2);
+                    } else {
+                        $mov->end_balance= bcmul($mov->start_balance + $mov->value,1,2);
+                    }
+                    $ultimo = bcmul($mov->end_balance, 1 ,2);
+                    $mov->update();
+                }
+                //DB::table('movements')->update((array)$movements);
+                $account->current_balance = bcmul($ultimo, 1 , 2);
+            }
+        }
+ 
 
         $account->update();
         return redirect()->route('home')->with('success', 'Your account has been updated');
