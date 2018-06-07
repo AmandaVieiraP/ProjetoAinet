@@ -25,7 +25,7 @@ class ChartsController extends Controller
             ->where('movements.date', '<=', $final)
             ->where('accounts.owner_id', '=', $id)
             ->groupBy('movement_categories.name', 'movements.type')
-            ->get();   
+            ->get();
         return view('accounts.partials.expensesRevenuesByDate', compact('totalExpenseRevenue', 'pagetitle', 'id'));
     }
 

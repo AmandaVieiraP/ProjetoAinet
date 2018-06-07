@@ -150,12 +150,12 @@ class AccountController extends Controller
                     if (strcmp($mov->type, "expense") ==0) {
                         $mov->end_balance= bcmul($mov->start_balance - $mov->value, 1, 2);
                     } else {
-                        $mov->end_balance= bcmul($mov->start_balance + $mov->value,1,2);
+                        $mov->end_balance= bcmul($mov->start_balance + $mov->value, 1, 2);
                     }
-                    $ultimo = bcmul($mov->end_balance, 1 ,2);
+                    $ultimo = bcmul($mov->end_balance, 1, 2);
                     $mov->update();
                 }
-                $account->current_balance = bcmul($ultimo, 1 , 2);
+                $account->current_balance = bcmul($ultimo, 1, 2);
             }
         }
         $account->update();

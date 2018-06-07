@@ -36,7 +36,6 @@ Route::group(
         Route::patch('{user}/promote', 'UserController@promoteUser')->name('promote.user');
         Route::get('{user}/demote', 'UserController@demoteUser')->name('get.demote.user');
         Route::patch('{user}/demote', 'UserController@demoteUser')->name('demote.user');
-        
     }
 );
 
@@ -84,7 +83,6 @@ Route::group(
         Route::get('{user}', 'AccountController@showAccounts')->name('accounts');
         Route::get('{user}/opened', 'AccountController@showOpenAccounts')->name('accounts.opened');
         Route::get('{user}/closed', 'AccountController@showCloseAccounts')->name('accounts.closed');
-        
     }
 );
 
@@ -103,7 +101,6 @@ Route::group(
         //US18
         Route::get('{account}', 'AccountController@edit')->name('account.edit');
         Route::put('{account}', 'AccountController@update')->name('account.update');
-        
     }
 );
 
@@ -117,13 +114,12 @@ Route::group(
         Route::get('{account}/create', 'MovementController@create')->name('movement.create');
         //US.21
         Route::post('{account}/create', 'MovementController@store')->name('movement.store');
-        
     }
 );
 
 Route::group(
     ['prefix'=>'movement',
-    ], 
+    ],
     function () {
         //US.21
         Route::get('{movement}', 'MovementController@edit')->name('movement.edit');
@@ -131,8 +127,6 @@ Route::group(
         Route::put('{movement}', 'MovementController@update')->name('movement.update');
         //US.21
         Route::delete('{movement}', 'MovementController@destroy')->name('movement.destroy');
-            
-        
     }
 );
 
@@ -170,5 +164,3 @@ Route::group(
         Route::get('{user}/evolution', 'ChartsController@showMonthlyEvolution')->name('user.evolutionExpensesRevenues');
     }
 );
-
-

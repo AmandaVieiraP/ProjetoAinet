@@ -49,8 +49,8 @@ class DocumentController extends Controller
         }
 
 
-        if($request->has('view')){
-          return $this->showInBrowser($id);
+        if ($request->has('view')) {
+            return $this->showInBrowser($id);
         }
 
         return Storage::download('documents/'.$movement->account_id.'/'.$movement->id.'.'.$document->type, $document->original_name, []);
@@ -128,7 +128,7 @@ class DocumentController extends Controller
               )
             );
         }
-         Storage::putFileAs('documents/'.$account->id.'/', $request->file('document_file'), $movement->id.'.'.$documentArray['type']);
+        Storage::putFileAs('documents/'.$account->id.'/', $request->file('document_file'), $movement->id.'.'.$documentArray['type']);
         
         return redirect()->route('movement.index', ['account' => $account->id])->with('successMsg', 'Your document has been uploaded');
         ;

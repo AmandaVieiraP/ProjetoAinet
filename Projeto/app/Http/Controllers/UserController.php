@@ -74,7 +74,7 @@ class UserController extends Controller
     {
         $pagetitle = "List of Users";
 
-        $users=UserController::filter($request); 
+        $users=UserController::filter($request);
 
         return view('users.listUsersToAdmin', compact('users', 'pagetitle'));
     }
@@ -93,7 +93,7 @@ class UserController extends Controller
 
         //só type normal
         if (!$request->filled('name')&& $request->filled('type') && $request->query('type')=='normal' && !$request->filled('status')) {
-            return User::where('admin', '=', false)->paginate(10);    
+            return User::where('admin', '=', false)->paginate(10);
         }
         //só type admin
         if (!$request->filled('name')&& $request->filled('type') && $request->query('type')=='admin' && !$request->filled('status')) {

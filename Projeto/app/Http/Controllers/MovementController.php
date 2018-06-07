@@ -200,7 +200,8 @@ class MovementController extends Controller
         }
     }
 
-    public function updateMovements($movements, $valuePropagate) {
+    public function updateMovements($movements, $valuePropagate)
+    {
         $start_balance_update = $valuePropagate;
                     
         foreach ($movements as $m) {
@@ -214,7 +215,6 @@ class MovementController extends Controller
             $m->save();
             $start_balance_update = $m->end_balance;
         }
-
     }
 
     /**

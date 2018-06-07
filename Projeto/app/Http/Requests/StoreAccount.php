@@ -26,17 +26,16 @@ class StoreAccount extends FormRequest
     public function rules()
     {
         return [
-            'code'=> ['required', Rule::unique('accounts')->where(function ($query){
-               return $query->where('owner_id', Auth::id());
+            'code'=> ['required', Rule::unique('accounts')->where(function ($query) {
+                return $query->where('owner_id', Auth::id());
             })],
-            'account_type_id'=>['required', 'exists:account_types,id',Rule::unique('accounts')->where(function ($query){
-               return $query->where('owner_id', Auth::id());
+            'account_type_id'=>['required', 'exists:account_types,id',Rule::unique('accounts')->where(function ($query) {
+                return $query->where('owner_id', Auth::id());
             })],
             'start_balance' => 'required|numeric',
             'description'=>'nullable|string',
             'date'=>'required|date',
-        ]; 
-     
+        ];
     }
 
     public function messages()
@@ -47,8 +46,7 @@ class StoreAccount extends FormRequest
             'code.required' => 'The code can not be empty',
             'date.required' => 'The date field can not be empty',
             'date.date' => 'The date is invalid',
-            'start_balance.required'=> 'The start balance value can not be empty',       
+            'start_balance.required'=> 'The start balance value can not be empty',
         ];
-
     }
 }
