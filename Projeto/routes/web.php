@@ -28,13 +28,13 @@ Route::group(
         //US5, US6
         Route::get('/', 'UserController@listAllUsersToAdmin')->name('list.of.all.users');
         //US7
-        Route::get('{user}/block', 'UserController@blockUser')->name('block.user');
+        Route::get('{user}/block', 'UserController@blockUser')->name('get.block.user');
         Route::patch('{user}/block', 'UserController@blockUser')->name('block.user');
-        Route::get('{user}/unblock', 'UserController@unblockUser')->name('unblock.user');
+        Route::get('{user}/unblock', 'UserController@unblockUser')->name('get.unblock.user');
         Route::patch('{user}/unblock', 'UserController@unblockUser')->name('unblock.user');
-        Route::get('{user}/promote', 'UserController@promoteUser')->name('promote.user');
+        Route::get('{user}/promote', 'UserController@promoteUser')->name('get.promote.user');
         Route::patch('{user}/promote', 'UserController@promoteUser')->name('promote.user');
-        Route::get('{user}/demote', 'UserController@demoteUser')->name('demote.user');
+        Route::get('{user}/demote', 'UserController@demoteUser')->name('get.demote.user');
         Route::patch('{user}/demote', 'UserController@demoteUser')->name('demote.user');
         
     }
@@ -75,8 +75,6 @@ Route::group(
 
 //US11
 Route::get('/profiles', 'UserController@getProfiles')->name('users.profiles');
-
-
 
 
 Route::group(

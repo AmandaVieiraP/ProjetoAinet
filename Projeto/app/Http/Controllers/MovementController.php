@@ -144,12 +144,6 @@ class MovementController extends Controller
                     'document_id' => $document->id,
                 ]);
 
-                /*if(!File::exists('documents/'.$accountOwner->id)) {
-                        // verifica se existe o diretorio
-                    Storage::makeDirectory('documents/'.$accountOwner->id);
-                }*/
-
-                //$path = $request->file('document_file')->storeAs('documents/'.$accountOwner->id, $movement->id.'.'.$document->type, 'local');
                 $path = Storage::putFileAs('documents/'.$account->id.'/', $request->file('document_file'), $movement->id.'.'.$document->type);
             } else {
                 $movement = Movement::create([
@@ -165,9 +159,6 @@ class MovementController extends Controller
                 ]);
             }
 
-            // dd($movement);
-        
-            
             $success = true;
         } catch (\Exception $ex) {
             if ($request->hasFile('document_file')) {
@@ -180,39 +171,6 @@ class MovementController extends Controller
         if ($success) {
             DB::commit();
 
-            //$movementsToUpdate = $account->movements()->where('id', '!=', $movement->id)->where('date', '>=', $movement->date)->where('created_at', '>', $movement->created_at)->orderBy('date')->orderBy('created_at')->get();
-            /*   $movementsToUpdate = $account->movements()->where('date', '>', $movement->date)->orWhere('date', '==', $movement->date)->where('created_at', '>', $movement->created_at)->orderBy('date')->orderBy('created_at')->get(); */
-
-
-            /*$movs = $account->movements;
-            $date = $movement->date;
-            $created_at = $movement->created_at;
-            $id = $account->id; */
-            /* $movementsToUpdate = $movs->where('date', '>', $movement->date)->orWhere(function($query) use ($date, $created_at) {
-               $query->where('value', '>=', 10); //->where('created_at', '>', $created_at);
-             })->get(); */
-
-            /*$movementsToUpdate = DB::table('movements')->where('account_id', '==', $account->id)->where('date', '>', $movement->date)->orWhere(function($query) use ($date, $created_at, $id) {
-              $query->where('account_id', '==', $id)->where('date', '==', $date)->where('created_at', '>', $created_at);
-            })->get(); */
-            /*
-                     $movs = $account->movements;
-                     $moves = $movs->where('date', '>=', $movement->date);
-
-                     $moves1 = $movs->where('date', '==', $date)->where('created_at', '<=', $created_at);
-
-
-                     //$movementsToUpdate = $moves->concat($moves1);
-                     $movementsToUpdate = $moves->diff($moves1);
-
-                    >where('name', '=', 'John')
-                        ->orWhere(function ($query) {
-                            $query->where('votes', '>', 100)
-                                  ->where('title', '<>', 'Admin');
-                        })
-                        ->get(); */
-
-
             $movs = $account->movements()->where('id', '!=', $movement->id)->where('date', '>=', $movement->date)->orderBy('date')->orderBy('created_at')->get();
             $movementsToUpdate = array();
             foreach ($movs as $m) {
@@ -223,32 +181,11 @@ class MovementController extends Controller
                 }
             }
 
-            /*      $movementsToUpdate = $account->movements()
-                       ->where('id', '!=', $movement->id)
-                       ->where('date', '>=', $movement->date)
-                       ->orderBy('date', 'asc')
-                       ->orderBy('created_at', 'asc')->get();
-*/
-
             if (count($movementsToUpdate) == 0) {
-                // não existe nenhum com data superior
                 $account->last_movement_date = $movement->date;
             } else {
-                if ($movement->type == 'expense') {
-                    foreach ($movementsToUpdate as $m) {
-                        $m->start_balance = $m->start_balance - $movement->value;
-                        $m->end_balance = $m->end_balance - $movement->value;
-                        $m->save();
-                    }
-                } else {
-                    foreach ($movementsToUpdate as $m) {
-                        $m->start_balance = $m->start_balance + $movement->value;
-                        $m->end_balance = $m->end_balance + $movement->value;
-                        $m->save();
-                    }
-                }
+                $this->updateMovements($movementsToUpdate, $movement->end_balance);
             }
-
 
             if ($type == 'expense') {
                 $account->current_balance = $account->current_balance - $movement->value;
@@ -256,13 +193,28 @@ class MovementController extends Controller
                 $account->current_balance = $account->current_balance + $movement->value;
             }
 
-
-
             $account->save();
             return redirect()->route('movement.index', $account->id)->with('successMsg', "Movement add successufly");
         } else {
             return redirect()->route('movement.index', $account->id)->with('errorMsg', "Couldn't add movement!");
         }
+    }
+
+    public function updateMovements($movements, $valuePropagate) {
+        $start_balance_update = $valuePropagate;
+                    
+        foreach ($movements as $m) {
+            if ($m->type == 'expense') {
+                $m->start_balance = $start_balance_update;
+                $m->end_balance = $m->start_balance - $m->value;
+            } else {
+                $m->start_balance = $start_balance_update;
+                $m->end_balance = $m->start_balance + $m->value;
+            }
+            $m->save();
+            $start_balance_update = $m->end_balance;
+        }
+
     }
 
     /**
@@ -337,7 +289,6 @@ class MovementController extends Controller
         
         DB::beginTransaction();
         try {
-
             // não tinha nenhum documento associado e não quer associar nenhum
             DB::table('movements')->where('id', '=', $movement->id)->update([
                     'movement_category_id' => $validatedData['movement_category_id'],
@@ -350,7 +301,6 @@ class MovementController extends Controller
            
             if (is_null($movement->document_id) && $request->hasFile('document_file')) {
                 // não tinha um documento associado mas agora quer associar
-
                 $document = Document::create([
                     'type' => $request->file('document_file')->getClientOriginalExtension(),
                     'original_name' => $request->file('document_file')->getClientOriginalName(),
@@ -386,9 +336,6 @@ class MovementController extends Controller
                 $path = Storage::putFileAs('documents/'.$account->id, $request->file('document_file'), $movement->id.'.'.$document->type);
             }
 
-            if (!is_null($movement->document_id) && !$request->hasFile('document_file')) {
-                // tinha associado um documento e agora quer desassociar
-            }
             $success = true;
         } catch (\Exception $ex) {
             if (!is_null($movement->document_id) && !$request->hasFile('document_file')) {
@@ -421,19 +368,8 @@ class MovementController extends Controller
                     // não existe nenhum com data superior
                     $account->current_balance = $movement->end_balance;
                 } else {
-                    $start_balance_update = $movement->end_balance;
-                    
-                    foreach ($movementsToUpdate as $m) {
-                        if ($m->type == 'expense') {
-                            $m->start_balance = $start_balance_update;
-                            $m->end_balance = $start_balance_update - $m->value;
-                        } else {
-                            $m->start_balance = $start_balance_update;
-                            $m->end_balance = $m->start_balance + $m->value;
-                        }
-                        $m->save();
-                        $start_balance_update = $m->end_balance;
-                    }
+                    $this->updateMovements($movementsToUpdate, $movement->end_balance);
+
                     $last = end($movementsToUpdate);
                     $account->current_balance = $last->end_balance;
                 }
@@ -441,8 +377,6 @@ class MovementController extends Controller
                 $account->save();
             }
 
-
-            
             return redirect()->route('movement.index', $account->id)->with('successMsg', "Movement edited successufly");
         } else {
             DB::rollBack();
@@ -498,7 +432,6 @@ class MovementController extends Controller
             $account->last_movement_date = null;
             $account->current_balance = $account->start_balance;
         } elseif (count($movementsToUpdate) == 0) {
-            // apagou o ultimo, atualiza last_movement_date do movement
             $m = $account->movements()->where('id', '!=', $movement->id)->where('date', '<=', $movement->date)->orderBy('date', 'desc')->first();
             $account->last_movement_date = $m->date;
         }
@@ -507,8 +440,6 @@ class MovementController extends Controller
         
         Movement::destroy($movement->id);
 
-        
-        //$movement->delete();
         return redirect()->route('movement.index', $account->id)->with('successMsg', 'Movement deleted successufly');
     }
 

@@ -48,11 +48,11 @@ class DocumentController extends Controller
             return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
 
+
         if($request->has('view')){
-           
           return $this->showInBrowser($id);
-       
         }
+
         return Storage::download('documents/'.$movement->account_id.'/'.$movement->id.'.'.$document->type, $document->original_name, []);
     }
 
@@ -60,13 +60,15 @@ class DocumentController extends Controller
     {
         $document=Document::findOrFail($id);
 
+
         $movement=Movement::where('document_id', $id)->first();
 
         if (Gate::forUser(Auth::user())->denies('download-document', $id)) {
             $pagetitle = "Unauthorized";
             return Response::make(view('errors.403', compact('pagetitle')), 403);
         }
-        return response()->file('documents/'.$movement->account_id.'/'.$movement->id.'.'.$document->type);
+        $path = storage_path('app/documents/'.$movement->account_id.'/'.$movement->id.'.'.$document->type);
+        return response()->file($path);
     }
 
     /**

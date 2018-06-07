@@ -20,7 +20,7 @@
         @if (auth()->user()->profile_photo)
             <img src="{{ asset('storage/profiles/' . auth()->user()->profile_photo) }}" class="img-thumbnail" alt="Foto Perfil" width="150" height="170">
         @else
-            <img src="{{ asset('storage/profiles/avatar.jpg') }}" class="img-thumbnail" alt="Foto Perfil" width="150" height="150">
+            <img src="{{ asset('images/avatar.png') }}" class="img-thumbnail" alt="Foto Perfil" width="150" height="150">
         @endif
         <p class="card-text">{{ Auth::user()->email }}</p>
         

@@ -46,7 +46,7 @@
                     </div>
                 @else
                     <div class="float_left">
-                        <img src="{{ asset('storage/profiles/avatar.jpg') }}" width="50" height="60" alt="Foto Perfil" class="img-round">
+                        <img src="{{ asset('images/avatar.png') }}" width="50" height="60" alt="Foto Perfil" class="img-round">
                     </div>
                 @endif
             </td>

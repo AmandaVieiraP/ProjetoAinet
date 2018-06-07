@@ -31,7 +31,7 @@
               @if ($users[$i]->profile_photo)
                 <img src="{{ asset('storage/profiles/'.$users[$i]->profile_photo) }}" alt="Foto Perfil" class="img-round">
               @else
-                <img src="{{ asset('storage/profiles/avatar.jpg') }}" alt="Foto Perfil" class="img-round">
+                <img src="{{ asset('images/avatar.png') }}" alt="Foto Perfil" class="img-round">
               @endif
             </td class="text-center">
             <td>{{ $users[$i]->name }}</td>

@@ -15,13 +15,13 @@
         <a class="nav-link" href="{{ route('dashboard',['user'=>$user->id]) }}"><strong>Dashboard</strong></a>
       </li>
       <li>
-        <a class="nav-link" href="{{ route('accounts',['user'=>$user->id]) }}"><strong>All Accounts</strong></a>
+        <a class="nav-link" href="{{ route('accounts',['user'=>$user->id]) }}"><strong>Show All Accounts</strong></a>
       </li>
       <li>
-        <a class="nav-link" href="{{ route('accounts.closed',['user'=>$user->id]) }}"><strong>Only Closed Accounts</strong></a>
+        <a class="nav-link" href="{{ route('accounts.closed',['user'=>$user->id]) }}"><strong>Show Only Closed Accounts</strong></a>
       </li>
       <li>
-        <a class="nav-link" href="{{ route('accounts.opened',['user'=>$user->id]) }}"><strong>Open Accounts</strong></a>
+        <a class="nav-link" href="{{ route('accounts.opened',['user'=>$user->id]) }}"><strong>Show Open Accounts</strong></a>
       </li>
       <li>
         <a class="nav-link" href="{{ route('account.create') }}"><strong>Add New Account</strong></a>

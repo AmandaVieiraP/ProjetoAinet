@@ -33,7 +33,7 @@
                 <td>
                     @if (is_null($user->profile_photo))
                         <div class="float-left"> 
-                            <img src="{{asset('storage/profiles/avatar.jpg')}}" alt="profile_photo" width="50" height="60" class="img-round">
+                            <img src="{{ asset('images/avatar.png') }}" alt="profile_photo" width="50" height="60" class="img-round">
                         </div>
                     @else 
                         <div class="float-left"> 
